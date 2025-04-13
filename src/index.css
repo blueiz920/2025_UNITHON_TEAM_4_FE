@@ -1,9 +1,11 @@
+@import "pretendard/dist/web/static/pretendard.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Pretendard", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -69,4 +71,20 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(70, 70, 70, 0.459);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(70, 70, 70, 0.7);
 }
