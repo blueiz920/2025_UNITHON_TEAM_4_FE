@@ -1,13 +1,21 @@
 import { UserPlus, Eye } from "lucide-react";
+import Navbar from "../../components/Navbar";
 
-const Signup = () => {
+const NAVBAR_HEIGHT = 90; // 네비게이션 바 높이(px)
+
+const SignupPage = () => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* 네비게이션 바 자리 */}
-      {/* <Navbar /> */}
+    <div className="min-h-screen bg-white overflow-hidden">
+      <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto bg-white border border-gray-200 rounded-2xl shadow p-8">
+      <main
+        className="flex justify-center items-center"
+        style={{
+          minHeight: `calc(100vh - ${NAVBAR_HEIGHT}px)`,
+          marginTop: NAVBAR_HEIGHT,
+        }}
+      >
+        <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow p-8">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center">
@@ -16,7 +24,8 @@ const Signup = () => {
             </div>
             <h1 className="text-2xl font-bold text-gray-900">회원가입</h1>
             <p className="text-gray-600 mt-2">
-              축제 커뮤니티에 가입하고<br />
+              축제 커뮤니티에 가입하고
+              <br />
               다양한 경험을 공유해보세요
             </p>
           </div>
@@ -123,7 +132,7 @@ const Signup = () => {
 
             <button
               type="button"
-              className="w-full h-11 rounded-lg font-bold text-white bg-green-500 hover:bg-green-600 transition-colors text-base mt-2"
+              className="w-full h-11 rounded-lg font-bold text-white bg-green-500 hover:bg-green-600 transition-colors text-base mt-2 text-center"
             >
               회원가입
             </button>
@@ -132,7 +141,10 @@ const Signup = () => {
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600">
               이미 계정이 있으신가요?{" "}
-              <a href="/login" className="text-green-500 hover:text-green-600 font-medium underline">
+              <a
+                href="/login"
+                className="text-green-500 hover:text-green-600 font-medium underline"
+              >
                 로그인
               </a>
             </p>
@@ -143,4 +155,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SignupPage;

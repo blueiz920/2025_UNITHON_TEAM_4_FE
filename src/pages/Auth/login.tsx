@@ -1,11 +1,13 @@
 import { LogIn, Eye } from "lucide-react";
+import Navbar from "../../components/Navbar";
 
-const Login = () => {
+const LoginPage = () => {
   return (
     <div
       className="fixed left-0 top-0 w-screen h-screen flex items-center justify-center bg-white z-50"
       style={{ minHeight: "100vh", minWidth: "100vw" }}
     >
+      <Navbar />
       <div className="w-[400px] bg-white border border-gray-200 rounded-2xl shadow p-8">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-5">
@@ -77,7 +79,7 @@ const Login = () => {
 
           <button
             type="button"
-            className="w-full h-11 rounded-lg font-bold text-white bg-green-500 hover:bg-green-600 transition-colors text-base mt-1"
+            className="w-full h-11 rounded-lg font-bold text-white bg-green-500 hover:bg-green-600 transition-colors text-base mt-1 text-center"
           >
             로그인
           </button>
@@ -96,4 +98,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;

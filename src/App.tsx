@@ -1,18 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
-import Login from "./../src/pages/login";
-import Signup from "./../src/pages/signup";
-
+import { RouterProvider } from "react-router-dom";
+import Router from "./routes/router";
+import "./index.css";
 function App() {
-  const [count, setCount] = useState(0);
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="min-h-screen bg-white ">
+      <RouterProvider router={Router} />
+    </div>
   );
 }
 
