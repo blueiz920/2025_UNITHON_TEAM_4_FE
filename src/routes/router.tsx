@@ -2,7 +2,7 @@ import { createBrowserRouter, RouteObject } from "react-router-dom";
 import RoutePath from "./routePath";
 import MainPage from "../pages/Main";
 // import OnboardingPage from "@/pages/Onboarding";
-// import FestivalPage from "@/pages/Festival";
+import FestivalPage from "../pages/Festival/festivals";
 // import FestivalPeriodPage from "@/pages/FestivalPeriod";
 // import CommunityPage from "@/pages/Community";
 import LoginPage from "../pages/Auth/login";
@@ -12,7 +12,7 @@ import SignupPage from "../pages/Auth/signup";
 const routes: RouteObject[] = [
   { path: RoutePath.Main, element: <MainPage /> },
   // { path: RoutePath.Onboarding, element: <OnboardingPage /> },
-  // { path: RoutePath.Festival, element: <FestivalPage /> },
+  { path: RoutePath.Festival, element: <FestivalPage /> },
   // { path: RoutePath.FestivalPeriod, element: <FestivalPeriodPage /> },
   // { path: RoutePath.Community, element: <CommunityPage /> },
   { path: RoutePath.Login, element: <LoginPage /> },
