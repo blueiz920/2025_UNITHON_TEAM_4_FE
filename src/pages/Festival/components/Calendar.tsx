@@ -1,56 +1,126 @@
-// src/pages/Festival/components/Calendar.tsx
-"use client";
+// src/components/Calendar.tsx
+import styles from "./Calendar.module.css";
+import {
+  format,
+  isSameDay,
+  isBefore,
+  isAfter,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+} from "date-fns";
 
-import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/dist/style.css";
-
-import { buttonVariants } from "../components/button";
-
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
-
-export function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}: CalendarProps) {
-  return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={`p-3 ${className ?? ""}`.trim()}
-      classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
-        nav: "space-x-1 flex items-center",
-        nav_button: `${buttonVariants({ variant: "outline" })} h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100`,
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: `${buttonVariants({ variant: "ghost" })} h-9 w-9 p-0 font-normal aria-selected:opacity-100`,
-        day_range_end: "day-range-end",
-        day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
-        day_outside: "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
-        ...classNames,
-      }}
-      components={{
-        IconLeft: () => <ChevronLeft className="h-4 w-4" />,
-        IconRight: () => <ChevronRight className="h-4 w-4" />,
-      }}
-      {...props}
-    />
-  );
+interface CalendarProps {
+  month: Date;
+  selectedStart: Date | null;
+  selectedEnd: Date | null;
+  hoveredDate: Date | null;
+  setHoveredDate: (date: Date | null) => void;
+  setSelectedStart: (date: Date | null) => void;
+  setSelectedEnd: (date: Date | null) => void;
 }
 
-Calendar.displayName = "Calendar";
+export function Calendar({
+  month,
+  selectedStart,
+  selectedEnd,
+  hoveredDate,
+  setHoveredDate,
+  setSelectedStart,
+  setSelectedEnd,
+}: CalendarProps) {
+  const generateCalendar = () => {
+    const start = startOfWeek(startOfMonth(month), { weekStartsOn: 0 });
+    const end = endOfWeek(endOfMonth(month), { weekStartsOn: 0 });
+    const days = [];
+    let current = start;
+    while (current <= end) {
+      days.push(current);
+      current = addDays(current, 1);
+    }
+    return days;
+  };
+
+  const handleDateClick = (date: Date) => {
+    if (!selectedStart || (selectedStart && selectedEnd)) {
+      setSelectedStart(date);
+      setSelectedEnd(null);
+    } else if (date < selectedStart) {
+      setSelectedStart(date);
+    } else {
+      setSelectedEnd(date);
+    }
+  };
+
+  const renderDay = (date: Date) => {
+    const isSelectedStart = selectedStart && isSameDay(date, selectedStart);
+    const isSelectedEnd = selectedEnd && isSameDay(date, selectedEnd);
+    const isInRange =
+      selectedStart && selectedEnd && isAfter(date, selectedStart) && isBefore(date, selectedEnd);
+
+    const isHoveredRange =
+      selectedStart &&
+      !selectedEnd &&
+      hoveredDate &&
+      ((date > selectedStart && date <= hoveredDate) ||
+        (date < selectedStart && date >= hoveredDate));
+
+    const className = `
+      ${styles.date_box}
+      ${isSelectedStart || isSelectedEnd ? styles.selected : ""}
+      ${isInRange || isHoveredRange ? styles.included : ""}
+    `;
+
+    const style =
+      isSelectedStart || isSelectedEnd
+        ? { backgroundColor: "#ff651b", color: "#fff", borderRadius: "50%" }
+        : {};
+
+    return (
+      <td key={date.toString()} className="date_row">
+        <div
+          className={className.trim()}
+          style={style}
+          onClick={() => handleDateClick(date)}
+          onMouseEnter={() => setHoveredDate(date)}
+        >
+          {format(date, "d")}
+        </div>
+      </td>
+    );
+  };
+
+  const weeks = [];
+  const days = generateCalendar();
+  for (let i = 0; i < days.length; i += 7) {
+    weeks.push(days.slice(i, i + 7));
+  }
+
+  return (
+    <div className={styles.calendar} style={{ width: "100%", maxWidth: "720px" }}>
+      <div
+        className={styles.container}
+        style={{ width: "100%", padding: "20px", paddingLeft: "8px" }}
+      >
+        <table className="table">
+          <thead>
+            <tr className="yoil">
+              {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+                <th key={day}>{day}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {weeks.map((week, i) => (
+              <tr key={i} className="date_row">
+                {week.map((day) => renderDay(day))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

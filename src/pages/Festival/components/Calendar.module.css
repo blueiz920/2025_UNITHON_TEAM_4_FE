@@ -1,0 +1,136 @@
+.calendar {
+  width: 700px;
+  height: 400px;
+  background-color: white;
+  box-shadow: 0 0 10px rgb(226, 222, 222);
+  border-radius: 20px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  transform: translateY(15px);
+  animation: 300ms appear;
+}
+
+.container {
+  width: 50%;
+  text-align: center;
+  padding: 30px;
+}
+
+.calendar .container h2 {
+  font-size: 17px;
+  margin-bottom: 20px;
+}
+
+.container table {
+  width: 100%;
+  font-size: 14px;
+}
+
+.yoil {
+  color: #687074;
+  cursor: default;
+}
+
+.left {
+  position: absolute;
+  top: 26px;
+  left: 30px;
+  padding: 7px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.right {
+  position: absolute;
+  top: 26px;
+  right: 30px;
+  padding: 7px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.left:hover,
+.right:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.table {
+  border-collapse: collapse;
+}
+
+.date_row td {
+  height: 37px;
+  line-height: 38px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #2c3e50;
+  transition: 160ms all ease-in-out;
+}
+
+.date_row td:hover {
+  color: #b8e8fc;
+}
+
+.selected {
+  background-color: rgb(244, 244, 244);
+}
+
+.date_box {
+  width: 40px;
+  height: 40px;
+}
+
+.start {
+  border-radius: 50% 0 0 50%;
+}
+
+.end {
+  border-radius: 0 50% 50% 0;
+}
+
+.selected .date_box {
+  background-color: #2f3438;
+  color: white !important;
+  border-radius: 50%;
+  transition: 160ms all ease-in-out;
+}
+
+.included {
+  background-color: rgb(244, 244, 244);
+  transition: 160ms all ease-in-out;
+}
+
+@media screen and (max-width: 768px) {
+  .calendar {
+    width: 100%;
+    height: auto;
+  }
+
+  .next {
+    display: none;
+  }
+
+  .container {
+    width: 350px;
+    margin: 0 auto;
+    position: center;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+@keyframes appear {
+  0% {
+    transform: translateY(5px);
+  }
+  100% {
+    transform: translateY(15px);
+  }
+}
