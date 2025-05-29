@@ -77,11 +77,18 @@ export default function FestivalPeriodPage() {
         </div>
 
         {/* 기간선택 바 */}
-        <div
+        {/* <div
           className={`sticky top-16 z-40 transition-all duration-700 ease-out ${
             isScrolled && !isExpanded
               ? "bg-white/95 backdrop-blur-md shadow-lg transform -translate-y-2"
               : "bg-transparent transform translate-y-0"
+          }`}
+        > */}
+        <div
+          className={`sticky top-16 z-40 transition-all duration-100 ease-out ${
+            isScrolled && !isExpanded
+              ? "bg-white/0 backdrop-blur-none  transform translate-y-3"
+              : "bg-transparent transform -translate-y-4"
           }`}
         >
           <PeriodSelectorBar
@@ -101,7 +108,7 @@ export default function FestivalPeriodPage() {
 
         {/* 확장된 상태일 때 배경 오버레이 */}
         {isScrolled && isExpanded && (
-          <div className="fixed inset-0 bg-black/30 z-30" onClick={() => setIsExpanded(false)} />
+          <div className="fixed inset-0 bg-black/20 z-30" onClick={() => setIsExpanded(false)} />
         )}
 
         {/* 결과 표시 및 그리드 */}

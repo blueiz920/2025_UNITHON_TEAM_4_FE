@@ -87,7 +87,7 @@ export function PeriodSelectorBar({
             opacity: 1,
           }}
           initial={false}
-          transition={{ duration: 0.18, ease: "easeInOut" }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
           className="mx-auto"
         >
           <div
@@ -95,7 +95,7 @@ export function PeriodSelectorBar({
             onClick={isMinimized ? onExpandClick : undefined}
           >
             {isMinimized ? (
-              <div className="flex items-center bg-white rounded-full shadow-lg border border-gray-200 hover:shadow-xl hover:scale-105 transition-transform w-full h-full">
+              <div className="flex items-center bg-[#fffefb] rounded-full shadow-lg border border-gray-300 hover:shadow-lg hover:scale-[102%] transition-transform w-full h-full">
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -126,7 +126,7 @@ export function PeriodSelectorBar({
                 </motion.div>
               </div>
             ) : (
-              <div className="bg-[#fffefb] rounded-full shadow-lg border border-gray-200 p-2">
+              <div className="bg-[#fffefb] rounded-full shadow-lg border border-gray-200 p-2 h-auto">
                 <div className="flex items-center" style={{ height: "60px" }}>
                   <div className="flex-1 px-6 py-3">
                     <motion.div
@@ -138,8 +138,8 @@ export function PeriodSelectorBar({
                       <label className="text-xs font-semibold text-gray-900 uppercase tracking-wide px-3">
                         어디서
                       </label>
-                      <Select value={selectedRegion} onValueChange={onRegionChange}>
-                        <SelectTrigger className="border-0 shadow-none p-0 h-auto focus:ring-0 -my-1">
+                      <Select value={selectedRegion} onValueChange={onRegionChange} className="shadow-none">
+                        <SelectTrigger className=" p-0 h-auto  -my-1">
                           <SelectValue placeholder="지역을 선택하세요" />
                         </SelectTrigger>
                         <SelectContent>
@@ -256,7 +256,7 @@ export function PeriodSelectorBar({
                       </div>
                     </div>
                     <Button
-                      className="bg-[#ff651b]/90 hover:bg-[#ff651b] text-[#fffefb] rounded-[40px] h-10 w-6 ml-0"
+                      className="bg-[#ff651b]/90 hover:bg-[#ff651b] text-[#fffefb] rounded-[90px] h-10 w-6 ml-0"
                       onClick={onSearch}
                     >
                       <Search className="h-5 w-5" />
