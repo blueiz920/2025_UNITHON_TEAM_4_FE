@@ -7,6 +7,8 @@ const RoutePath = {
   Login: "/login",
   Signup: "/signup",
   MyPage: "/mypage",
+  CreatePostPage: "/create",
+  PostPage: "/community/:id",
 };
 
 export default RoutePath;
