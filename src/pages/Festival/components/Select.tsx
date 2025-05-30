@@ -1,0 +1,90 @@
+// src/pages/Festival/components/select.tsx
+import * as React from "react";
+import { useState, useContext, createContext } from "react";
+import { cva } from "class-variance-authority";
+
+const selectTriggerVariants = cva(
+  "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+);
+
+// Context to manage open state
+const SelectContext = createContext<{
+  open: boolean;
+  setOpen: (value: boolean) => void;
+} | null>(null);
+
+export const Select = ({ children }: { children: React.ReactNode }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <SelectContext.Provider value={{ open, setOpen }}>
+      <div className="relative w-full">{children}</div>
+    </SelectContext.Provider>
+  );
+};
+
+export const SelectTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className = "", ...props }, ref) => {
+  const context = useContext(SelectContext);
+  if (!context) throw new Error("SelectTrigger must be used within Select");
+
+  const { setOpen } = context;
+
+  return (
+    <button
+      ref={ref}
+      className={`${selectTriggerVariants()} ${className}`}
+      onClick={(e) => {
+        props.onClick?.(e);
+        setOpen((prev) => !prev);
+      }}
+      {...props}
+    />
+  );
+});
+SelectTrigger.displayName = "SelectTrigger";
+
+export const SelectValue = ({ placeholder }: { placeholder?: string }) => {
+  return <span className="text-sm text-muted-foreground">{placeholder}</span>;
+};
+
+export const SelectContent = ({ children }: { children: React.ReactNode }) => {
+  const context = useContext(SelectContext);
+  if (!context) throw new Error("SelectContent must be used within Select");
+  const { open } = context;
+
+  if (!open) return null;
+
+  return (
+    <div className="absolute z-20 mt-1 w-full rounded-md border bg-white shadow-lg">
+      <div className="max-h-60 overflow-y-auto p-1 text-sm">{children}</div>
+    </div>
+  );
+};
+
+export const SelectItem = ({
+  children,
+  value,
+  onClick,
+}: {
+  children: React.ReactNode;
+  value: string;
+  onClick?: () => void;
+}) => {
+  const context = useContext(SelectContext);
+  if (!context) throw new Error("SelectItem must be used within Select");
+  const { setOpen } = context;
+
+  return (
+    <div
+      onClick={() => {
+        onClick?.();
+        setOpen(false);
+      }}
+      className="cursor-pointer rounded-sm px-2 py-1.5 hover:bg-accent hover:text-accent-foreground"
+    >
+      {children}
+    </div>
+  );
+};
