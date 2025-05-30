@@ -1,4 +1,5 @@
 // src/components/Calendar.tsx
+import { m } from 'framer-motion';
 import styles from "./Calendar.module.css";
 import {
   format,
@@ -73,10 +74,20 @@ export function Calendar({
       ${isInRange || isHoveredRange ? styles.included : ""}
     `;
 
-    const style =
-      isSelectedStart || isSelectedEnd
-        ? { backgroundColor: "#ff651b", color: "#fff", borderRadius: "50%" }
-        : {};
+    const style = isSelectedStart
+  ? {
+      backgroundColor: "#ff651b",
+      color: "#fffefb",
+      borderRadius: "45% 0% 0% 45%",
+    }
+  : isSelectedEnd
+  ? {
+      backgroundColor: "#ff651b",
+      color: "#fffefb",
+      borderRadius: "0% 45% 45% 0%",
+    }
+  : {
+    };
 
     return (
       <td key={date.toString()} className="date_row">
@@ -114,7 +125,7 @@ export function Calendar({
           </thead>
           <tbody>
             {weeks.map((week, i) => (
-              <tr key={i} className="date_row">
+              <tr key={i} className="date_row cursor-pointer">
                 {week.map((day) => renderDay(day))}
               </tr>
             ))}

@@ -16,6 +16,7 @@ import { Calendar } from "../components/Calendar";
 import { addMonths, format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { motion } from "framer-motion";
+import { pre } from 'framer-motion/client';
 
 interface PeriodSelectorBarProps {
   isCompact: boolean;
@@ -164,20 +165,22 @@ export function PeriodSelectorBar({
                         언제
                       </label>
                       <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                        <PopoverTrigger asChild>
-                          <button className="text-start w-full">
-                            <div
-                              className={`text-sm ${
-                                selectedStartDate ? "text-gray-900" : "text-gray-500"
-                              }`}
-                            >
-                              {formatDateRange()}
-                            </div>
-                          </button>
-                        </PopoverTrigger>
+  <PopoverTrigger>
+    <div role="button" tabIndex={0} className="text-start w-full cursor-pointer">
+      <div
+        className={`text-sm ${
+          selectedStartDate ? "text-gray-900" : "text-gray-500"
+        }`}
+      >
+        {formatDateRange()}
+      </div>
+    </div>
+  </PopoverTrigger>
                         <PopoverContent
+                          onClick={(e) => e.stopPropagation()}
                           side="bottom"
                           sideOffset={8}
+                          forceMount
                           className="absolute left-[43%]  transform -translate-x-1/2 w-[720px]  bg-[#fffefb] rounded-xl shadow-lg z-50"
                         >
                           <div className="flex">

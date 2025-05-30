@@ -60,7 +60,7 @@ export default function FestivalPeriodPage() {
         {/* 상단 인트로 텍스트 */}
         <div
           ref={headerRef}
-          className={`transition-all duration-700 ease-out overflow-hidden  ${
+          className={`transition-all duration-500 ease-out overflow-hidden  ${
             isScrolled && !isExpanded
               ? "opacity-0 -translate-y-full max-h-0 py-0"
               : "opacity-100 translate-y-0 max-h-96 py-12"
