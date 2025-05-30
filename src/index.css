@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-
- ✅ 기본 상속 방해 요소 제거
-:root {
+✅ 기본 상속 방해 요소 제거 :root {
   font-family: "Pretendard", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,17 +11,21 @@
 }
 
 /* ✅ 불필요한 상속 제거 */
- body {
+html,
+body,
+#root {
   margin: 0;
+  height: 100%;
   min-width: 320px;
   min-height: 100vh;
-} */
+}
+*/
 
 /* ✅ a, h1, button 등의 default 스타일 제거 */
  a {
   text-decoration: inherit;
-} */
-a:hover {
+}
+*/ a:hover {
   /* 색상 제거 */
 }
 
@@ -31,10 +33,10 @@ h1 {
   /* 기본 폰트/색상 제거 */
 }
 
- button {
+button {
   all: unset; /* 👈 버튼 기본 스타일 초기화 후 Tailwind로 적용할 수 있게 */
-   cursor: pointer;
- }  
+  cursor: pointer;
+}
 
 /* ✅ 스크롤바 커스텀 유지 */
 ::-webkit-scrollbar {
@@ -52,4 +54,4 @@ h1 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(70, 70, 70, 0.7);
-} 
+}
