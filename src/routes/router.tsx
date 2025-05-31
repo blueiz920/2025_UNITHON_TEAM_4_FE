@@ -7,7 +7,7 @@ import FestivalPeriodPage from "../pages/Festival/festivalperiod";
 // import CommunityPage from "@/pages/Community";
 import LoginPage from "../pages/Auth/login";
 import SignupPage from "../pages/Auth/signup";
-// import MyPage from "@/pages/Mypage";
+import MyPage from "../pages/Mypage";
 
 const routes: RouteObject[] = [
   { path: RoutePath.Main, element: <MainPage /> },
@@ -17,7 +17,7 @@ const routes: RouteObject[] = [
   // { path: RoutePath.Community, element: <CommunityPage /> },
   { path: RoutePath.Login, element: <LoginPage /> },
   { path: RoutePath.Signup, element: <SignupPage /> },
-  // { path: RoutePath.MyPage, element: <MyPage /> },
+  { path: RoutePath.MyPage, element: <MyPage /> },
 ];
 
 const Router = createBrowserRouter(routes);
