@@ -17,6 +17,9 @@ const floatingKeywords = [
   { text: "탈춤축제", x: 75, y: 35, delay: 2.5, color: "bg-purple-100 text-purple-700" },
   { text: "산천어축제", x: 5, y: 50, delay: 3, color: "bg-cyan-100 text-cyan-700" },
   { text: "청자축제", x: 90, y: 80, delay: 1.8, color: "bg-emerald-100 text-emerald-700" },
+  { text: "전통문화축제", x: 70, y: 70, delay: 2.8, color: "bg-lime-100 text-lime-700" },
+  { text: "가을단풍축제", x: 35, y: 80, delay: 3.3, color: "bg-orange-100 text-orange-700" },
+  { text: "겨울얼음축제", x: 90, y: 30, delay: 3.7, color: "bg-slate-100 text-slate-700" },
 ]
 
 
