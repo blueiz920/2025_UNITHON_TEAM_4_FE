@@ -2,8 +2,8 @@
 "use client";
 
 import { MapPin, Calendar } from "lucide-react";
-import { Button } from "../components/button";
-import { Badge } from "../components/Badge";
+import { Button } from "../../../components/ui/button";
+import { Badge } from "../../../components/ui/Badge";
 import { regions, seasons } from "../constants";
 
 interface AppliedFiltersProps {

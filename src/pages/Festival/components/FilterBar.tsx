@@ -2,8 +2,8 @@
 "use client";
 
 import { Filter } from "lucide-react";
-import { Badge } from "../components/Badge";
-import { Button } from "../components/button";
+import { Badge } from "../../../components/ui/Badge";
+import { Button } from "../../../components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
 import {
   Select,

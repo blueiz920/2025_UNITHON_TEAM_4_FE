@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "../components/button";
+import { Button } from "../../../components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
 import {
   Select,
@@ -259,6 +259,7 @@ export function PeriodSelectorBar({
                       </div>
                     </div>
                     <Button
+                      variant="default"
                       className="bg-[#ff651b]/90 hover:bg-[#ff651b] text-[#fffefb] rounded-[90px] h-10 w-6 ml-0"
                       onClick={onSearch}
                     >

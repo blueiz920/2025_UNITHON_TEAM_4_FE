@@ -4,8 +4,8 @@ import { MapPin, Calendar, Star, ChevronLeft, ChevronRight } from "lucide-react"
 import { sampleFestivals } from "../constants";
 type Festival = (typeof sampleFestivals)[number];
 
-import { Button } from "../components/button";
-import { Badge } from "../components/Badge";
+import { Button } from "../../../components/ui/button";
+import { Badge } from "../../../components/ui/Badge";
 import { Link } from "react-router-dom";
 
 interface FeaturedFestivalSliderProps {
@@ -98,7 +98,7 @@ export function FeaturedFestivalSlider({ festivals }: FeaturedFestivalSliderProp
                           </Badge>
                           <Badge
                             variant="outline"
-                            className="border-white/30 bg-white/10 text-[#Fffefb]"
+                            className="border-white/30 bg-white/10 text-[#fffefb]"
                           >
                             {festival.keywords[0]}
                           </Badge>
@@ -135,7 +135,7 @@ export function FeaturedFestivalSlider({ festivals }: FeaturedFestivalSliderProp
                           ))}
                         </div>
 
-                        <Button className="mt-4 bg-[#ff651b]/90 hover:bg-[#ff651b]">
+                        <Button variant="ghost"className="mt-4 bg-[#ff651b]/90 hover:bg-[#ff651b]">
                           자세히 보기
                         </Button>
                       </div>

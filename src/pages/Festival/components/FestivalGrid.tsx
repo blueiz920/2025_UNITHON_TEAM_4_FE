@@ -5,8 +5,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MapPin, Calendar } from "lucide-react";
 
-import { Button } from "../components/button";
-import { Badge } from "../components/Badge";
+import { Button } from "../../../components/ui/button";
+import { Badge } from "../../../components/ui/Badge";
 
 export type Festival = {
   id: string;
@@ -73,12 +73,12 @@ export function FestivalGrid({ festivals }: { festivals: Festival[] }) {
 
               <div className="flex flex-wrap gap-1">
                 {festival.keywords.slice(0, 3).map((keyword) => (
-                  <Badge key={keyword} variant="outline" className="text-xs">
+                  <Badge key={keyword} variant="outline" className="text-xs text-gray-700">
                     {keyword}
                   </Badge>
                 ))}
                 {festival.keywords.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs text-gray-700">
                     +{festival.keywords.length - 3}
                   </Badge>
                 )}

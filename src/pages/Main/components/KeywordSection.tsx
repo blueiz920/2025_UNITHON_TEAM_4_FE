@@ -1,0 +1,62 @@
+import { Badge } from "../../../components/ui/Badge"
+import { Button } from "../../../components/ui/button"
+import { useNavigate } from "react-router-dom"
+
+const keywords = [
+  "봄",
+  "여름",
+  "가을",
+  "겨울",
+  "전통",
+  "체험",
+  "공연",
+  "음식",
+  "불꽃",
+  "등불",
+  "벚꽃",
+  "야경",
+  "서울",
+  "부산",
+  "제주도",
+  "강원도",
+  "경상도",
+  "전라도",
+]
+
+export default function KeywordSection() {
+  const navigate = useNavigate()
+
+  const handleClick = (keyword: string) => {
+    navigate(`/festivals?keyword=${encodeURIComponent(keyword)}`)
+  }
+
+  return (
+    <section className="bg-gray-50 py-16">
+      <div className="container mx-auto px-4">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">키워드로 탐색하기</h2>
+          <Button
+            variant="ghost"
+            className="text-rose-500 hover:text-rose-600"
+            onClick={() => navigate("/festivals")}
+          >
+            모든 축제 보기 →
+          </Button>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {keywords.map((keyword) => (
+            <Badge
+              key={keyword}
+              variant="outline"
+              className="cursor-pointer text-gray-800  bg-white px-4 py-2 text-sm hover:bg-[#ff651b]/15 hover:border-[#ff651b]/50 transition-all duration-200"
+              onClick={() => handleClick(keyword)}
+            >
+              {keyword}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
