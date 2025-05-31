@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "./Card"
-import  {seasonalFestivals}  from "./Hero"
+import  {seasonalFestivals}  from "./seasonalFestivals"
 
 interface Props {
   currentSeason: number
