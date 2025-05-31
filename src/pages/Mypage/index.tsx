@@ -139,7 +139,7 @@ export default function MyPage() {
                       <div
                         key={post.id + "-" + idx}
                         className="bg-gray-100 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow relative mb-6"
-                        style={{ minHeight: 150, maxHeight: 300 }}
+                        style={{ minHeight: 150, maxHeight: 300}}
                       >
                         {/* 이미지 영역 */}
                         <div className="aspect-[5/3] rounded-lg bg-gray-200 flex items-center justify-center">

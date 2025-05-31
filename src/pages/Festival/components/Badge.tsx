@@ -5,7 +5,7 @@ const baseStyle =
   "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors";
 
 const variantMap = {
-  default: "bg-blue-600 text-white hover:bg-blue-700",
+  default: "bg-[#ff651b] text-[#fffefb] hover:bg-blue-700",
   secondary: "bg-gray-100 text-gray-800",
   destructive: "bg-red-600 text-white",
   outline: "border border-gray-300 text-gray-800",

@@ -1,6 +1,6 @@
 const RoutePath = {
   Main: "/main",
-  Onboarding: "/onboarding",
+  Onboarding: "/",
   Festival: "/festival",
   FestivalPeriod: "/festivalperiod",
   Community: "/community",
