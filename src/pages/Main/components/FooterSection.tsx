@@ -19,10 +19,10 @@ export default function FooterSection() {
             <h3 className="mb-4 text-lg font-semibold">빠른 링크</h3>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <Button variant="ghost" className="h-auto p-0 text-gray-600 hover:text-rose-500" onClick={() => navigate("/festivals")}>전체 축제</Button>
+                <Button variant="ghost" className="h-auto p-0 text-gray-600 hover:text-rose-500" onClick={() => navigate("/festival")}>전체 축제</Button>
               </li>
               <li>
-                <Button variant="ghost" className="h-auto p-0 text-gray-600 hover:text-rose-500" onClick={() => navigate("/festivals/period")}>기간별 축제</Button>
+                <Button variant="ghost" className="h-auto p-0 text-gray-600 hover:text-rose-500" onClick={() => navigate("/festivalperiod")}>기간별 축제</Button>
               </li>
               <li>
                 <Button variant="ghost" className="h-auto p-0 text-gray-600 hover:text-rose-500" onClick={() => navigate("/community")}>커뮤니티</Button>

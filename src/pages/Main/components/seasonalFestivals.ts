@@ -7,7 +7,7 @@ export const seasonalFestivals = [
     festivals: ["진해 군항제", "여의도 벚꽃축제", "경주 벚꽃축제"],
     accent: "text-pink-600",
     color: "bg-gradient-to-br from-pink-50 to-rose-100",
-    border: "border-pink-200 border-2",
+    border: "border-pink-200 border-2 transition-colors duration-1000",
     shadow: "0 0 0 3px #f9a8d4", // 봄: 연핑크 (pink-200)
   },
   {

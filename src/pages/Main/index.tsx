@@ -9,7 +9,7 @@ import { useState } from "react"
 export default function MainPage() {
   const [currentSeason, setCurrentSeason] = useState(0)
   return (
-    <div className="min-h-screen bg-white ">
+    <div className="min-h-screen bg-[#fffefb] ">
       <Navbar />
       <Hero setCurrentSeason={setCurrentSeason}/>
       <SeasonalSection currentSeason={currentSeason}/>

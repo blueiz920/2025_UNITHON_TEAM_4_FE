@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "./Card"
 import  {seasonalFestivals}  from "./seasonalFestivals"
+import { motion } from "framer-motion"
 
 interface Props {
   currentSeason: number
@@ -11,6 +12,15 @@ export default function SeasonSection({ currentSeason }: Props) {
 
   return (
     <section className="py-0 -translate-y-3 bg-[#fffefb]">
+      <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{
+            delay: 1.5,
+            duration: 0.7,
+            ease: "easeInOut",
+          }}
+        >
       <div className="container mx-auto px-4 -translate-y-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">계절별 추천 축제</h2>
@@ -54,7 +64,7 @@ export default function SeasonSection({ currentSeason }: Props) {
             </Card>
           ))}
         </div>
-      </div>
+      </div></motion.div>
     </section>
   )
 }

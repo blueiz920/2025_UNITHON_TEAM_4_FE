@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { Search } from "lucide-react"
+import { Search, Sparkles, CalendarDays } from "lucide-react"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
 import { Badge } from "../../../components/ui/Badge"
@@ -185,6 +185,39 @@ export default function Hero({ setCurrentSeason }: HeroProps) {
             </Button>
           </motion.div>
         </form>
+        {/* 빠른 액션 버튼 */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center z-10">
+            <motion.div
+              whileHover={{
+                scale: 1.05,
+              transition: { type: "spring", ease: "easeOut",duration: 0.3 }
+              }}
+            >
+            <Button
+              size="lg"
+              className={`  ${seasonalFestivals[currentSeason].border} ${seasonalFestivals[currentSeason].accent}  transition-colors duration-1000 rounded-full px-8`}
+              onClick={() => navigate("/festival")}
+            >
+              <Sparkles className="mr-2 h-5 w-5" />
+              전국축제 둘러보기
+            </Button></motion.div>
+            <motion.div
+              whileHover={{
+                scale: 1.05,
+              transition: { type: "spring", ease: "easeOut",duration: 0.3 }
+              }}
+            >
+            <Button
+              size="lg"
+              variant="outline"
+              className={` ${seasonalFestivals[currentSeason].border}   ${seasonalFestivals[currentSeason].accent} transition-colors duration-1000 rounded-full px-8`}
+              onClick={() => navigate("/festivalperiod")}
+            >
+              <CalendarDays className="mr-2 h-5 w-5" />
+              기간별로 찾기
+            </Button>
+            </motion.div>
+          </div>
       </div></motion.div>
     </section>
     </motion.div>

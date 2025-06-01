@@ -37,8 +37,8 @@ export default function KeywordSection() {
           <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">키워드로 탐색하기</h2>
           <Button
             variant="ghost"
-            className="text-[#ff651b]/90 hover:text-[#ff651b]"
-            onClick={() => navigate("/festivals")}
+            className="text-[#ff651b]/90 hover:text-[#ff651b] hover:scale-105 transition-transform duration-200"
+            onClick={() => navigate("/festival")}
           >
             모든 축제 보기 →
           </Button>
