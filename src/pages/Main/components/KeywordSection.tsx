@@ -31,13 +31,13 @@ export default function KeywordSection() {
   }
 
   return (
-    <section className="bg-gray-50 py-16">
+    <section className="bg-[#fffefb] py-16">
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">키워드로 탐색하기</h2>
           <Button
             variant="ghost"
-            className="text-rose-500 hover:text-rose-600"
+            className="text-[#ff651b]/90 hover:text-[#ff651b]"
             onClick={() => navigate("/festivals")}
           >
             모든 축제 보기 →

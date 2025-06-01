@@ -37,7 +37,7 @@ export default function FooterSection() {
             <p className="mb-4 text-sm text-gray-600">최신 축제 정보를 받아보세요.</p>
             <form className="flex gap-2">
               <Input type="email" placeholder="이메일 주소" className="h-10" />
-              <Button type="submit" className="h-10 bg-rose-500 hover:bg-rose-600">
+              <Button type="submit" className="absolute relative right-0 w-10 h-auto bg-[#ff651b]/90 hover:bg-[#ff651b] rounded-xl text-[#fffefb]">
                 구독
               </Button>
             </form>
