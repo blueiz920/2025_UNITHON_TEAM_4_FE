@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar/index";
 import { Tabs, TabsList, TabsTrigger } from "./components/Tabs";
-import { Button } from "./components/button";
+import { Button } from "../../components/ui/button";
 import { FestivalGrid } from "./components/FestivalGrid";
 import { FilterBar } from "./components/FilterBar";
 import { AppliedFilters } from "./components/AppliedFilters";
