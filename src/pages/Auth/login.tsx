@@ -17,6 +17,7 @@ const LoginPage = () => {
       window.location.replace("/main"); // 🔁 여기서 페이지 이동!
     } catch (err) {
       setError("오류가 발생했습니다.");
+      console.error("로그인 실패:", err);
     } //나중에 response status에 따라 에러 메시지 다르게 처리하기
   };
 

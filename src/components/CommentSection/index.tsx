@@ -21,7 +21,7 @@ export default function CommentSection({ postId }: CommentSectionProps) {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [translatedComments, setTranslatedComments] = useState<{ [key: number]: string }>({});
-  const [currentLanguage, setCurrentLanguage] = useState("ko"); // 실제로는 네브바에서 선택한 언어를 가져와야 함
+  const [currentLanguage] = useState("ko"); // 실제로는 네브바에서 선택한 언어를 가져와야 함
 
   useEffect(() => {
     // 실제 구현에서는 API 호출로 댓글을 가져올 것입니다

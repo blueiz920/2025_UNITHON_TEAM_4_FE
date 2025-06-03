@@ -30,6 +30,7 @@ const SignupPage = () => {
       window.location.replace("/login");
     } catch (err) {
       setError("회원가입 중 문제가 발생했습니다.");
+      console.error("회원가입 실패:", err);
     }
   };
 
