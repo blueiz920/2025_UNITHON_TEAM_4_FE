@@ -1,68 +1,95 @@
-import axios, { InternalAxiosRequestConfig } from "axios";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-// 실제 백엔드 서버 주소 (포트 포함! 실제 서버에 맞게 수정)
-const BACKEND_BASE_URL = "http://15.164.50.164:8080/api/v1";
-
-// 환경에 따라 프록시 경로 다르게 만드는 함수
-const getApiUrl = (endpoint: string) => {
-  // 축제 API라면 v1을 제거
-  const isFestivalApi = endpoint.startsWith("/festivals");
-  const base = isFestivalApi
-    ? BACKEND_BASE_URL.replace(/\/v1$/, "") // v1 제거
-    : BACKEND_BASE_URL;
-  // Vercel(prod) 환경이면 프록시 사용
-  if (import.meta.env.MODE === "production") {
-    const target = `${base}${endpoint}`;
-    return `/api/proxy?url=${encodeURIComponent(target)}`;
-  }
-  // 개발환경은 Vite 프록시로 직접 접근
-  return `${base}${endpoint}`;
-};
-
-const client = axios.create({
-  // baseURL 사용 안 함!
-  withCredentials: true,
-  // headers: {
-  //   "Content-Type": "application/json",
-  // },
-});
-
-// 요청 인터셉터 (토큰 자동 부착)
-client.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    config.withCredentials = true;
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
+function getHeaders(headersObj: VercelRequest["headers"]): Record<string, string> {
+  const headers: Record<string, string> = {};
+  Object.entries(headersObj).forEach(([key, value]) => {
+    const lowerKey = key.toLowerCase();
+    // 'host'는 항상 제거
+    // 'content-length'는 fetch가 자동으로 계산하므로 제거 (특히 raw body 보낼 때 필수)
+    if (lowerKey === "host" || lowerKey === "content-length") {
+      return;
     }
-    return config;
-  },
-  (error) => {
-    console.error("Request error:", error);
-    return Promise.reject(error);
-  }
-);
-
-// 응답 인터셉터 (401/리프레시 토큰 등)
-// 응답 인터셉터 (401/리프레시 토큰 등)
-client.interceptors.response.use(
-  (res) => {
-    if (res.data.refreshed) {
-      const new_Token = res.headers["authorization"];
-      localStorage.setItem("accessToken", new_Token);
+    if (typeof value === "string") {
+      headers[key] = value;
+    } else if (Array.isArray(value)) {
+      headers[key] = value.join(", ");
     }
-    return res;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.clear();
-    }
-    return Promise.reject(error);
+  });
+  return headers;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const { url, ...params } = req.query;
+  if (!url || typeof url !== "string") {
+    res.status(400).send("Missing target URL");
+    return;
   }
-);
 
-// 내보낼 때, getApiUrl 함수도 함께 export!
-export { getApiUrl };
+  const paramString = Object.entries(params)
+    .filter(([k, v]) => v !== undefined && v !== "" && k !== "url")
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v as string)}`)
+    .join("&");
 
-export default client;
+  const backendUrl =
+    decodeURIComponent(url) + (paramString ? (url.includes("?") ? "&" : "?") + paramString : "");
+
+  console.log("[Vercel Proxy] 실제 요청하는 백엔드 URL:", backendUrl);
+
+  let body: BodyInit | undefined = undefined; // fetch API의 BodyInit 타입 사용
+  const contentType = req.headers['content-type']; // Content-Type 헤더 가져오기
+
+  if (req.method !== "GET" && req.method !== "HEAD" && req.body) {
+    if (contentType && contentType.startsWith("multipart/form-data")) {
+      // multipart/form-data는 Buffer/raw 형태로 오므로 그대로 전달
+      body = req.body; // VercelRequest['body']는 Buffer를 포함할 수 있음
+    } else if (typeof req.body === "object") {
+      // 일반적인 JSON 또는 form-urlencoded (객체로 파싱된 경우)
+      body = JSON.stringify(req.body);
+      // Content-Type이 JSON이 아닌 경우 (예: form-urlencoded를 JSON.stringify하면 안됨)
+      // 이 부분은 클라이언트가 보내는 Content-Type을 정확히 알아야 함.
+      // 안전하게 가려면, 특정 Content-Type이 아니면 JSON.stringify를 하지 않는 것도 방법.
+      // 하지만 대부분의 경우 JSON.stringify(object)는 문제 없습니다.
+      // (단, fetch headers에 Content-Type: application/json을 명시해야 함)
+      // 현재 getHeaders에서 Content-Type을 그대로 전달하고 있으므로, 클라이언트가 application/json으로 보낸다면 문제 없음.
+    } else if (typeof req.body === "string") {
+      // 이미 문자열인 경우 (예: text/plain, 또는 자동으로 파싱되지 않은 경우)
+      body = req.body;
+    } else if (req.body instanceof Buffer) {
+        // 혹시 모르니 Buffer 타입도 명시적으로 처리
+        body = req.body;
+    }
+  }
+
+  const headers = getHeaders(req.headers);
+
+  // multipart/form-data를 위한 Content-Type 수정 (fetch가 알아서 boundary 처리)
+  // 단, req.body가 Buffer로 들어왔을 때 Content-Type 헤더를 다시 설정하지 않으면,
+  // Node.js fetch가 Content-Type을 application/octet-stream 등으로 기본 설정할 수 있습니다.
+  // 원본 Content-Type을 유지하는 것이 중요합니다.
+  if (contentType && contentType.startsWith("multipart/form-data")) {
+      // 만약 Node.js fetch가 Content-Type을 잘못 설정한다면, 여기서 강제로 원본 값을 넣어줄 수 있습니다.
+      // headers['Content-Type'] = contentType;
+      // 하지만 getHeaders에서 제거하지 않았으므로, 원본 헤더가 그대로 전달될 것입니다.
+      // 이 부분은 보통 fetch가 알아서 잘 처리합니다.
+  } else if (typeof req.body === "object" && body === JSON.stringify(req.body) && !headers['content-type']) {
+      // req.body가 객체이고 JSON.stringify를 거쳤는데 Content-Type이 없으면 추가
+      // headers['Content-Type'] = 'application/json'; // 클라이언트에서 이 헤더를 보내지 않는다면 추가
+  }
+
+
+  try {
+    const fetchRes = await fetch(backendUrl, {
+      method: req.method,
+      headers,
+      body,
+    });
+
+    res.status(fetchRes.status);
+    fetchRes.headers.forEach((v, k) => res.setHeader(k, v));
+    const buffer = await fetchRes.arrayBuffer();
+    res.send(Buffer.from(buffer));
+  } catch (error) {
+    console.error("[Vercel Proxy] fetch 요청 실패:", error);
+    res.status(500).send("프록시 요청에 실패했습니다. 잠시 후 다시 시도해주세요.");
+  }
+}
