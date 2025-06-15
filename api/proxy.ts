@@ -1,5 +1,7 @@
+// /api/proxy.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
+// host, content-length 등 제거
 function getHeaders(headersObj: VercelRequest["headers"]): Record<string, string> {
   const headers: Record<string, string> = {};
   Object.entries(headersObj).forEach(([key, value]) => {
@@ -17,7 +19,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(400).send("Missing target URL");
     return;
   }
-
   const paramString = Object.entries(params)
     .filter(([k, v]) => v !== undefined && v !== "" && k !== "url")
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v as string)}`)
@@ -27,28 +28,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const headers = getHeaders(req.headers);
 
-  // ---- 🔥 body 분기 처리 ----
-  let body: any = undefined;
-  const contentType = req.headers["content-type"] || req.headers["Content-Type"] || "";
-
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    if (contentType.startsWith("multipart/form-data")) {
-      // 파일 업로드: Buffer 그대로 전달
-      body = req.body;
-    } else if (contentType.includes("application/json")) {
-      // JSON: stringify해서 전달
-      body = typeof req.body === "string" ? req.body : JSON.stringify(req.body);
-    } else if (typeof req.body === "string" || req.body instanceof Buffer) {
-      // 그 외: 문자열 혹은 버퍼면 그대로 전달
-      body = req.body;
-    }
-  }
-
+  // [핵심] req.body 대신 req (readable stream)를 그대로 fetch의 body에 넘기기
+  // Node.js 18 이상 fetch에서 ReadableStream 지원됨 (Vercel 런타임도 지원)
   try {
     const fetchRes = await fetch(backendUrl, {
       method: req.method,
       headers,
-      body,
+      body: req.method === "GET" || req.method === "HEAD" ? undefined : (req as any),
+      duplex: "half", // Node.js fetch에 Stream 쓰려면 반드시 duplex: "half" 필요
     });
     res.status(fetchRes.status);
     fetchRes.headers.forEach((v, k) => res.setHeader(k, v));
