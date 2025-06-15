@@ -34,7 +34,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const fetchRes = await fetch(backendUrl, {
       method: req.method,
       headers,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       body: req.method === "GET" || req.method === "HEAD" ? undefined : (req as any),
+        // @ts-expect-error: duplex is required for streaming in Node.js fetch, but not in types
+
       duplex: "half", // Node.js fetch에 Stream 쓰려면 반드시 duplex: "half" 필요
     });
     res.status(fetchRes.status);
