@@ -1,13 +1,11 @@
 {
   "version": 2,
   "routes": [
-    { "handle": "filesystem" },
     {
-      "src": "/api/proxy",
-      "dest": "/api/proxy.ts"
+      "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
+      "src": "/.*",
       "dest": "/index.html"
     }
   ]
