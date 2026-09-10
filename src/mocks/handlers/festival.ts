@@ -10,7 +10,14 @@ function parsePositiveInteger(value: string | null, fallback: number) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function getPagination(request: Request) {
+function normalizeDate(value: string | null) {
+  if (!value) return undefined;
+
+  const normalized = value.replace(/-/g, "");
+  return /^\d{8}$/.test(normalized) ? normalized : undefined;
+}
+
+function getFestivalListParams(request: Request) {
   const requestUrl = new URL(request.url);
 
   return {
@@ -19,13 +26,31 @@ function getPagination(request: Request) {
       requestUrl.searchParams.get("numOfRows"),
       DEFAULT_NUM_OF_ROWS,
     ),
+    eventStartDate: normalizeDate(requestUrl.searchParams.get("eventStartDate")),
+    eventEndDate: normalizeDate(requestUrl.searchParams.get("eventEndDate")),
+    areaCode: requestUrl.searchParams.get("areaCode")?.trim() || undefined,
   };
 }
 
 function createFestivalListResponse(request: Request) {
-  const { pageNo, numOfRows } = getPagination(request);
+  const { pageNo, numOfRows, eventStartDate, eventEndDate, areaCode } =
+    getFestivalListParams(request);
+  const filteredFestivals = mockFestivals.filter((festival) => {
+    const festivalStartDate = normalizeDate(festival.eventstartdate ?? null);
+    const festivalEndDate = normalizeDate(festival.eventenddate ?? null);
+
+    if (areaCode && festival.areacode !== areaCode) return false;
+    if (eventStartDate && (!festivalEndDate || festivalEndDate < eventStartDate)) {
+      return false;
+    }
+    if (eventEndDate && (!festivalStartDate || festivalStartDate > eventEndDate)) {
+      return false;
+    }
+
+    return true;
+  });
   const startIndex = (pageNo - 1) * numOfRows;
-  const item = mockFestivals.slice(startIndex, startIndex + numOfRows);
+  const item = filteredFestivals.slice(startIndex, startIndex + numOfRows);
 
   const response: FestivalListResponse = {
     status: 200,
@@ -42,7 +67,7 @@ function createFestivalListResponse(request: Request) {
           },
           numOfRows,
           pageNo,
-          totalCount: mockFestivals.length,
+          totalCount: filteredFestivals.length,
         },
       },
     },
