@@ -1,5 +1,25 @@
 import type { FestivalListItem } from "../../types/festival";
 
+const today = new Date();
+today.setHours(12, 0, 0, 0);
+
+function getRelativeDate(offsetDays: number) {
+  const date = new Date(today);
+  date.setDate(date.getDate() + offsetDays);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return year + month + day;
+}
+
+function getRelativeEventDates(startOffset: number, endOffset: number) {
+  return {
+    eventstartdate: getRelativeDate(startOffset),
+    eventenddate: getRelativeDate(endOffset),
+  };
+}
+
 export const mockFestivals: FestivalListItem[] = [
   {
     addr1: "서울특별시 중구 세종대로",
@@ -17,8 +37,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "서울빛축제",
     zipcode: "04524",
     overview: "도심의 밤을 빛으로 채우는 서울 대표 야간 문화축제입니다.",
-    eventstartdate: "20260901",
-    eventenddate: "20260930",
+    ...getRelativeEventDates(-5, 10),
   },
   {
     addr1: "부산광역시 해운대구 해운대해변로",
@@ -36,8 +55,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "부산바다예술제",
     zipcode: "48094",
     overview: "해변과 예술이 만나는 부산의 가을 바다 문화축제입니다.",
-    eventstartdate: "20260905",
-    eventenddate: "20261005",
+    ...getRelativeEventDates(-1, 5),
   },
   {
     addr1: "인천광역시 중구 차이나타운로",
@@ -55,8 +73,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "인천개항문화축제",
     zipcode: "22312",
     overview: "개항장의 역사와 현재를 함께 즐기는 거리 문화축제입니다.",
-    eventstartdate: "20260912",
-    eventenddate: "20260920",
+    ...getRelativeEventDates(2, 12),
   },
   {
     addr1: "대전광역시 유성구 대덕대로",
@@ -74,8 +91,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "대전사이언스페스티벌",
     zipcode: "34126",
     overview: "과학 체험과 공연을 한자리에서 만나는 가족 축제입니다.",
-    eventstartdate: "20260918",
-    eventenddate: "20260927",
+    ...getRelativeEventDates(7, 17),
   },
   {
     addr1: "대구광역시 달서구 두류공원로",
@@ -93,8 +109,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "대구도심음악축제",
     zipcode: "42672",
     overview: "도심 곳곳에서 다양한 장르의 음악을 즐기는 시민 축제입니다.",
-    eventstartdate: "20260920",
-    eventenddate: "20261010",
+    ...getRelativeEventDates(-60, -45),
   },
   {
     addr1: "광주광역시 북구 비엔날레로",
@@ -112,8 +127,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "광주거리예술축제",
     zipcode: "61104",
     overview: "거리 공연과 전시를 자유롭게 만날 수 있는 예술 축제입니다.",
-    eventstartdate: "20260925",
-    eventenddate: "20261004",
+    ...getRelativeEventDates(-30, -15),
   },
   {
     addr1: "울산광역시 남구 장생포고래로",
@@ -131,8 +145,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "울산고래문화축제",
     zipcode: "44780",
     overview: "장생포의 바다 이야기와 체험을 만나는 해양 문화축제입니다.",
-    eventstartdate: "20261001",
-    eventenddate: "20261004",
+    ...getRelativeEventDates(20, 28),
   },
   {
     addr1: "세종특별자치시 연기면 세종호수공원길",
@@ -150,8 +163,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "세종호수공원음악축제",
     zipcode: "30100",
     overview: "호수의 풍경과 함께 즐기는 야외 음악과 문화 프로그램입니다.",
-    eventstartdate: "20261009",
-    eventenddate: "20261011",
+    ...getRelativeEventDates(-2, 2),
   },
   {
     addr1: "경기도 수원시 팔달구 정조로",
@@ -169,8 +181,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "수원화성문화제",
     zipcode: "16254",
     overview: "수원화성의 역사와 전통 공연을 함께 즐기는 문화축제입니다.",
-    eventstartdate: "20261003",
-    eventenddate: "20261006",
+    ...getRelativeEventDates(-90, -70),
   },
   {
     addr1: "강원특별자치도 춘천시 춘천로",
@@ -188,8 +199,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "춘천호수별빛축제",
     zipcode: "24365",
     overview: "춘천의 호수와 가을밤을 배경으로 펼쳐지는 빛 축제입니다.",
-    eventstartdate: "20261010",
-    eventenddate: "20261025",
+    ...getRelativeEventDates(30, 38),
   },
   {
     addr1: "충청북도 청주시 흥덕구 직지대로",
@@ -207,8 +217,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "청주직지문화제",
     zipcode: "28501",
     overview: "기록문화와 시민 체험을 연결하는 인쇄문화 축제입니다.",
-    eventstartdate: "20261014",
-    eventenddate: "20261017",
+    ...getRelativeEventDates(-10, 3),
   },
   {
     addr1: "충청남도 공주시 웅진로",
@@ -226,8 +235,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "공주백제문화제",
     zipcode: "32547",
     overview: "백제의 역사와 문화를 공연과 체험으로 만나는 축제입니다.",
-    eventstartdate: "20261020",
-    eventenddate: "20261026",
+    ...getRelativeEventDates(-45, -25),
   },
   {
     addr1: "경상북도 경주시 첨성로",
@@ -245,8 +253,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "경주신라문화제",
     zipcode: "38167",
     overview: "천년 고도 경주의 역사와 전통을 현대적으로 즐기는 축제입니다.",
-    eventstartdate: "20261024",
-    eventenddate: "20261030",
+    ...getRelativeEventDates(45, 60),
   },
   {
     addr1: "경상남도 진주시 남강로",
@@ -264,8 +271,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "진주남강유등축제",
     zipcode: "52692",
     overview: "남강을 수놓은 등불과 함께하는 진주의 대표 야간 축제입니다.",
-    eventstartdate: "20261028",
-    eventenddate: "20261105",
+    ...getRelativeEventDates(-3, 1),
   },
   {
     addr1: "전북특별자치도 전주시 완산구 태조로",
@@ -283,8 +289,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "전주한옥마을문화축제",
     zipcode: "55045",
     overview: "한옥마을의 전통과 지역 예술을 함께 만나는 문화축제입니다.",
-    eventstartdate: "20261101",
-    eventenddate: "20261108",
+    ...getRelativeEventDates(-120, -100),
   },
   {
     addr1: "전라남도 여수시 이순신광장로",
@@ -302,8 +307,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "여수밤바다불꽃축제",
     zipcode: "59737",
     overview: "여수 밤바다와 불꽃 공연을 즐기는 해양 관광축제입니다.",
-    eventstartdate: "20261107",
-    eventenddate: "20261107",
+    ...getRelativeEventDates(15, 25),
   },
   {
     addr1: "전라남도 목포시 해안로",
@@ -321,8 +325,7 @@ export const mockFestivals: FestivalListItem[] = [
     title: "목포항구축제",
     zipcode: "58752",
     overview: "항구의 맛과 음악을 만나는 목포의 가을 대표 축제입니다.",
-    eventstartdate: "20261112",
-    eventenddate: "20261115",
+    ...getRelativeEventDates(-14, -1),
   },
   {
     addr1: "제주특별자치도 제주시 구좌읍 해맞이해안로",
@@ -340,7 +343,6 @@ export const mockFestivals: FestivalListItem[] = [
     title: "제주해녀문화축제",
     zipcode: "63362",
     overview: "제주 해녀의 삶과 바다 문화를 체험하는 지역 축제입니다.",
-    eventstartdate: "20261120",
-    eventenddate: "20261122",
+    ...getRelativeEventDates(60, 75),
   },
 ];
