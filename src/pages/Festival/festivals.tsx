@@ -11,7 +11,7 @@ import { FeaturedFestivalSlider } from "./components/FeaturedFestivalSlider";
 import {
   useInfiniteFestivalList,
   useInfiniteFestivalSearch,
-  useInfiniteFestivalSearchByKeywords,
+  useFestivalSearchByKeywords,
 } from "../../hooks/useFestivalList";
 import { useBottomObserver } from "../../hooks/useBottomObserver";
 import { LoadingFestival } from "./LoadingFestival";
@@ -90,16 +90,17 @@ export default function FestivalPage() {
 
   const isSearching = searchQuery.trim().length > 0 || selectedKeywords.length > 0;
   const keyword = selectedKeywords[0] || searchQuery.trim() || "";
-  const isMultiKeywordOr = selectedKeywords.length > 1 && keywordFilterMode === "OR";
+  const isMultiKeywordSearch = selectedKeywords.length > 1;
 
-  const searchResult = useInfiniteFestivalSearch(isMultiKeywordOr ? "" : keyword);
-  const multiKeywordSearchResult = useInfiniteFestivalSearchByKeywords(
+  const searchResult = useInfiniteFestivalSearch(isMultiKeywordSearch ? "" : keyword);
+  const multiKeywordSearchResult = useFestivalSearchByKeywords(
     selectedKeywords,
-    isMultiKeywordOr,
+    keywordFilterMode,
+    isMultiKeywordSearch,
   );
   const listResult = useInfiniteFestivalList(filterParams);
 
-  const activeSearchResult = isMultiKeywordOr ? multiKeywordSearchResult : searchResult;
+  const activeSearchResult = isMultiKeywordSearch ? multiKeywordSearchResult : searchResult;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
     isSearching ? activeSearchResult : listResult;
 
@@ -118,7 +119,7 @@ export default function FestivalPage() {
       return [];
     });
 
-    const uniqueItems = isMultiKeywordOr
+    const uniqueItems = isMultiKeywordSearch
       ? Array.from(
           new Map(
             allItems.map((item) => [item.contentid, item]),
@@ -164,7 +165,7 @@ export default function FestivalPage() {
         featured: !ended && featuredIds.includes(item.contentid),
       };
     });
-  }, [data, detailsMap, isMultiKeywordOr, t]);
+  }, [data, detailsMap, isMultiKeywordSearch, t]);
 
   const festivalsWithDetails: Festival[] = useMemo(
     () =>
@@ -180,16 +181,6 @@ export default function FestivalPage() {
 
   const filteredFestivals: Festival[] = useMemo(() => {
     let filtered = festivalsWithDetails;
-    if (selectedKeywords.length > 1 && keywordFilterMode === "AND") {
-      filtered = filtered.filter((festival) => {
-        const text = [festival.name, festival.description, ...(festival.keywords ?? [])]
-          .join(" ")
-          .toLowerCase();
-        return keywordFilterMode === "AND"
-          ? selectedKeywords.every((k) => text.includes(k.toLowerCase()))
-          : selectedKeywords.some((k) => text.includes(k.toLowerCase()));
-      });
-    }
     if (selectedRegion !== "all") {
       filtered = filtered.filter((festival) => festival.location.includes(selectedRegion));
     }
@@ -207,7 +198,7 @@ export default function FestivalPage() {
       );
     }
     return filtered;
-  }, [festivalsWithDetails, selectedKeywords, selectedRegion, selectedSeason, keywordFilterMode]);
+  }, [festivalsWithDetails, selectedRegion, selectedSeason]);
 
   const handleUpdateDetails: React.Dispatch<React.SetStateAction<DetailsMap>> = setDetailsMap;
 
@@ -237,19 +228,12 @@ export default function FestivalPage() {
 
   const totalCount = useMemo(() => {
     if (!data) return 0;
-    if (isMultiKeywordOr) {
-      const allItems = data.pages.flatMap((page) => {
-        if (Array.isArray(page)) return page;
-        if ("item" in page) return page.item;
-        return [];
-      });
-      return new Set(allItems.map((item) => item.contentid)).size;
-    }
     const firstPage = data.pages[0];
+    if (!firstPage) return 0;
     if (Array.isArray(firstPage)) return firstPage.length;
     if ("totalCount" in firstPage) return firstPage.totalCount;
     return 0;
-  }, [data, isMultiKeywordOr]);
+  }, [data]);
 
   if (isLoading) return <LoadingFestival />;
   if (isError)
