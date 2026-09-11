@@ -18,169 +18,581 @@ export function isFestivalSearchLanguage(
   return value !== null && FESTIVAL_SEARCH_LANGUAGES.includes(value as FestivalSearchLanguage);
 }
 
-type FestivalSearchAliases = Record<FestivalSearchLanguage, string[]>;
+export type FestivalSearchTerms = {
+  aliases: readonly string[];
+  tags: readonly string[];
+};
+
+type FestivalSearchAliases = Record<
+  FestivalSearchLanguage,
+  FestivalSearchTerms
+>;
+
+const FESTIVAL_FILTER_TERMS: Record<
+  FestivalSearchLanguage,
+  readonly string[]
+> = {
+  kor: [
+    "봄",
+    "여름",
+    "가을",
+    "겨울",
+    "전통",
+    "체험",
+    "공연",
+    "음식",
+    "불꽃",
+    "등불",
+    "벚꽃",
+    "야경",
+    "서울",
+    "부산",
+    "제주도",
+    "강원도",
+  ],
+  eng: [
+    "Spring",
+    "Summer",
+    "Autumn",
+    "Winter",
+    "Traditional",
+    "Experience",
+    "Performance",
+    "Food",
+    "Fireworks",
+    "Lantern",
+    "Cherry Blossom",
+    "Night View",
+    "Seoul",
+    "Busan",
+    "Jeju",
+    "Gangwon",
+  ],
+  jpn: [
+    "春",
+    "夏",
+    "秋",
+    "冬",
+    "伝統",
+    "体験",
+    "公演",
+    "グルメ",
+    "花火",
+    "提灯",
+    "桜",
+    "夜景",
+    "ソウル",
+    "釜山",
+    "済州島",
+    "江原道",
+  ],
+  chn: [
+    "春",
+    "夏",
+    "秋",
+    "冬",
+    "传统",
+    "体验",
+    "表演",
+    "美食",
+    "烟花",
+    "灯笼",
+    "樱花",
+    "夜景",
+    "首尔",
+    "釜山",
+    "济州岛",
+    "江原道",
+  ],
+  fra: [
+    "Printemps",
+    "Été",
+    "Automne",
+    "Hiver",
+    "Tradition",
+    "Expérience",
+    "Spectacle",
+    "Gastronomie",
+    "Feux d'artifice",
+    "Lanternes",
+    "Cerisiers",
+    "Paysage nocturne",
+    "Séoul",
+    "Busan",
+    "Jeju",
+    "Gangwon",
+  ],
+  spa: [
+    "Primavera",
+    "Verano",
+    "Otoño",
+    "Invierno",
+    "Tradición",
+    "Experiencia",
+    "Espectáculo",
+    "Gastronomía",
+    "Fuegos artificiales",
+    "Faroles",
+    "Cerezos",
+    "Paisaje nocturno",
+    "Seúl",
+    "Busan",
+    "Jeju",
+    "Gangwon",
+  ],
+  rus: [
+    "Весна",
+    "Лето",
+    "Осень",
+    "Зима",
+    "Традиция",
+    "Опыт",
+    "Шоу",
+    "Еда",
+    "Фейерверк",
+    "Фонарь",
+    "Сакура",
+    "Ночной пейзаж",
+    "Сеул",
+    "Пусан",
+    "Чеджу",
+    "Канвондо",
+  ],
+};
+
+function normalizeFilterTerm(value: string) {
+  return value.trim().toLowerCase();
+}
+
+export function isFestivalFilterKeyword(
+  value: string,
+  lang: FestivalSearchLanguage,
+) {
+  const normalizedValue = normalizeFilterTerm(value);
+  return FESTIVAL_FILTER_TERMS[lang].some(
+    (term) => normalizeFilterTerm(term) === normalizedValue,
+  );
+}
 
 export const festivalSearchAliases: Record<string, FestivalSearchAliases> = {
   "mock-festival-001": {
-    kor: ["서울", "서울빛축제", "빛", "야경"],
-    eng: ["Seoul", "Seoul Light Festival", "Light", "Night View"],
-    jpn: ["ソウル", "ソウル光祭り", "光", "夜景"],
-    chn: ["首尔", "首尔灯光节", "灯光", "夜景"],
-    fra: ["Séoul", "Festival des lumières de Séoul", "Lumière", "Paysage nocturne"],
-    spa: ["Seúl", "Festival de luces de Seúl", "Luz", "Paisaje nocturno"],
-    rus: ["Сеул", "Фестиваль света в Сеуле", "Свет", "Ночной пейзаж"],
+    kor: { aliases: ["서울빛축제", "빛"], tags: ["서울", "야경"] },
+    eng: { aliases: ["Seoul Light Festival", "Light"], tags: ["Seoul", "Night View"] },
+    jpn: { aliases: ["ソウル光祭り", "光"], tags: ["ソウル", "夜景"] },
+    chn: { aliases: ["首尔灯光节", "灯光"], tags: ["首尔", "夜景"] },
+    fra: {
+      aliases: ["Festival des lumières de Séoul", "Lumière"],
+      tags: ["Séoul", "Paysage nocturne"],
+    },
+    spa: {
+      aliases: ["Festival de luces de Seúl", "Luz"],
+      tags: ["Seúl", "Paisaje nocturno"],
+    },
+    rus: {
+      aliases: ["Фестиваль света в Сеуле", "Свет"],
+      tags: ["Сеул", "Ночной пейзаж"],
+    },
   },
   "mock-festival-002": {
-    kor: ["부산", "바다", "예술", "가을", "체험"],
-    eng: ["Busan", "Sea", "Art", "Autumn", "Experience"],
-    jpn: ["釜山", "海", "アート", "秋", "体験"],
-    chn: ["釜山", "海", "艺术", "秋", "体验"],
-    fra: ["Busan", "Mer", "Art", "Automne", "Expérience"],
-    spa: ["Busan", "Mar", "Arte", "Otoño", "Experiencia"],
-    rus: ["Пусан", "Море", "Искусство", "Осень", "Опыт"],
+    kor: { aliases: ["바다", "예술"], tags: ["부산", "가을", "체험"] },
+    eng: { aliases: ["Sea", "Art"], tags: ["Busan", "Autumn", "Experience"] },
+    jpn: { aliases: ["海", "アート"], tags: ["釜山", "秋", "体験"] },
+    chn: { aliases: ["海", "艺术"], tags: ["釜山", "秋", "体验"] },
+    fra: { aliases: ["Mer", "Art"], tags: ["Busan", "Automne", "Expérience"] },
+    spa: { aliases: ["Mar", "Arte"], tags: ["Busan", "Otoño", "Experiencia"] },
+    rus: { aliases: ["Море", "Искусство"], tags: ["Пусан", "Осень", "Опыт"] },
   },
   "mock-festival-003": {
-    kor: ["인천", "전통", "역사", "공연", "벚꽃", "봄"],
-    eng: ["Incheon", "Traditional", "History", "Performance", "Cherry Blossom", "Spring"],
-    jpn: ["仁川", "伝統", "歴史", "公演", "桜", "春"],
-    chn: ["仁川", "传统", "历史", "表演", "樱花", "春"],
-    fra: ["Incheon", "Tradition", "Histoire", "Spectacle", "Cerisiers", "Printemps"],
-    spa: ["Incheon", "Tradición", "Historia", "Espectáculo", "Cerezos", "Primavera"],
-    rus: ["Инчхон", "Традиция", "История", "Шоу", "Сакура", "Весна"],
+    kor: { aliases: ["인천", "역사"], tags: ["전통", "공연", "벚꽃", "봄"] },
+    eng: {
+      aliases: ["Incheon", "History"],
+      tags: ["Traditional", "Performance", "Cherry Blossom", "Spring"],
+    },
+    jpn: {
+      aliases: ["仁川", "歴史"],
+      tags: ["伝統", "公演", "桜", "春"],
+    },
+    chn: {
+      aliases: ["仁川", "历史"],
+      tags: ["传统", "表演", "樱花", "春"],
+    },
+    fra: {
+      aliases: ["Incheon", "Histoire"],
+      tags: ["Tradition", "Spectacle", "Cerisiers", "Printemps"],
+    },
+    spa: {
+      aliases: ["Incheon", "Historia"],
+      tags: ["Tradición", "Espectáculo", "Cerezos", "Primavera"],
+    },
+    rus: {
+      aliases: ["Инчхон", "История"],
+      tags: ["Традиция", "Шоу", "Сакура", "Весна"],
+    },
   },
   "mock-festival-004": {
-    kor: ["대전", "과학", "가족", "체험", "공연"],
-    eng: ["Daejeon", "Science", "Family", "Experience", "Performance"],
-    jpn: ["大田", "科学", "家族", "体験", "公演"],
-    chn: ["大田", "科学", "家庭", "体验", "表演"],
-    fra: ["Daejeon", "Science", "Famille", "Expérience", "Spectacle"],
-    spa: ["Daejeon", "Ciencia", "Familia", "Experiencia", "Espectáculo"],
-    rus: ["Тэджон", "Наука", "Семья", "Опыт", "Шоу"],
+    kor: { aliases: ["대전", "과학", "가족"], tags: ["체험", "공연"] },
+    eng: {
+      aliases: ["Daejeon", "Science", "Family"],
+      tags: ["Experience", "Performance"],
+    },
+    jpn: {
+      aliases: ["大田", "科学", "家族"],
+      tags: ["体験", "公演"],
+    },
+    chn: {
+      aliases: ["大田", "科学", "家庭"],
+      tags: ["体验", "表演"],
+    },
+    fra: {
+      aliases: ["Daejeon", "Science", "Famille"],
+      tags: ["Expérience", "Spectacle"],
+    },
+    spa: {
+      aliases: ["Daejeon", "Ciencia", "Familia"],
+      tags: ["Experiencia", "Espectáculo"],
+    },
+    rus: {
+      aliases: ["Тэджон", "Наука", "Семья"],
+      tags: ["Опыт", "Шоу"],
+    },
   },
   "mock-festival-005": {
-    kor: ["대구", "음악", "공연", "여름"],
-    eng: ["Daegu", "Music", "Performance", "Summer"],
-    jpn: ["大邱", "音楽", "公演", "夏"],
-    chn: ["大邱", "音乐", "表演", "夏"],
-    fra: ["Daegu", "Musique", "Spectacle", "Été"],
-    spa: ["Daegu", "Música", "Espectáculo", "Verano"],
-    rus: ["Тэгу", "Музыка", "Шоу", "Лето"],
+    kor: { aliases: ["대구", "음악"], tags: ["공연", "여름"] },
+    eng: { aliases: ["Daegu", "Music"], tags: ["Performance", "Summer"] },
+    jpn: { aliases: ["大邱", "音楽"], tags: ["公演", "夏"] },
+    chn: { aliases: ["大邱", "音乐"], tags: ["表演", "夏"] },
+    fra: { aliases: ["Daegu", "Musique"], tags: ["Spectacle", "Été"] },
+    spa: { aliases: ["Daegu", "Música"], tags: ["Espectáculo", "Verano"] },
+    rus: { aliases: ["Тэгу", "Музыка"], tags: ["Шоу", "Лето"] },
   },
   "mock-festival-006": {
-    kor: ["광주", "거리", "예술", "공연", "체험"],
-    eng: ["Gwangju", "Street", "Art", "Performance", "Experience"],
-    jpn: ["光州", "街", "アート", "公演", "体験"],
-    chn: ["光州", "街头", "艺术", "表演", "体验"],
-    fra: ["Gwangju", "Rue", "Art", "Spectacle", "Expérience"],
-    spa: ["Gwangju", "Calle", "Arte", "Espectáculo", "Experiencia"],
-    rus: ["Кванджу", "Улица", "Искусство", "Шоу", "Опыт"],
+    kor: { aliases: ["광주", "거리", "예술"], tags: ["공연", "체험"] },
+    eng: {
+      aliases: ["Gwangju", "Street", "Art"],
+      tags: ["Performance", "Experience"],
+    },
+    jpn: {
+      aliases: ["光州", "街", "アート"],
+      tags: ["公演", "体験"],
+    },
+    chn: {
+      aliases: ["光州", "街头", "艺术"],
+      tags: ["表演", "体验"],
+    },
+    fra: {
+      aliases: ["Gwangju", "Rue", "Art"],
+      tags: ["Spectacle", "Expérience"],
+    },
+    spa: {
+      aliases: ["Gwangju", "Calle", "Arte"],
+      tags: ["Espectáculo", "Experiencia"],
+    },
+    rus: {
+      aliases: ["Кванджу", "Улица", "Искусство"],
+      tags: ["Шоу", "Опыт"],
+    },
   },
   "mock-festival-007": {
-    kor: ["울산", "고래", "바다", "해양", "체험"],
-    eng: ["Ulsan", "Whale", "Sea", "Ocean", "Experience"],
-    jpn: ["蔚山", "クジラ", "海", "海洋", "体験"],
-    chn: ["蔚山", "鲸鱼", "海", "海洋", "体验"],
-    fra: ["Ulsan", "Baleine", "Mer", "Océan", "Expérience"],
-    spa: ["Ulsan", "Ballena", "Mar", "Océano", "Experiencia"],
-    rus: ["Ульсан", "Кит", "Море", "Океан", "Опыт"],
+    kor: { aliases: ["울산", "고래", "바다", "해양"], tags: ["체험"] },
+    eng: {
+      aliases: ["Ulsan", "Whale", "Sea", "Ocean"],
+      tags: ["Experience"],
+    },
+    jpn: {
+      aliases: ["蔚山", "クジラ", "海", "海洋"],
+      tags: ["体験"],
+    },
+    chn: {
+      aliases: ["蔚山", "鲸鱼", "海", "海洋"],
+      tags: ["体验"],
+    },
+    fra: {
+      aliases: ["Ulsan", "Baleine", "Mer", "Océan"],
+      tags: ["Expérience"],
+    },
+    spa: {
+      aliases: ["Ulsan", "Ballena", "Mar", "Océano"],
+      tags: ["Experiencia"],
+    },
+    rus: {
+      aliases: ["Ульсан", "Кит", "Море", "Океан"],
+      tags: ["Опыт"],
+    },
   },
   "mock-festival-008": {
-    kor: ["세종", "호수", "음악", "공연", "여름"],
-    eng: ["Sejong", "Lake", "Music", "Performance", "Summer"],
-    jpn: ["世宗", "湖", "音楽", "公演", "夏"],
-    chn: ["世宗", "湖", "音乐", "表演", "夏"],
-    fra: ["Sejong", "Lac", "Musique", "Spectacle", "Été"],
-    spa: ["Sejong", "Lago", "Música", "Espectáculo", "Verano"],
-    rus: ["Седжон", "Озеро", "Музыка", "Шоу", "Лето"],
+    kor: { aliases: ["세종", "호수", "음악"], tags: ["공연", "여름"] },
+    eng: {
+      aliases: ["Sejong", "Lake", "Music"],
+      tags: ["Performance", "Summer"],
+    },
+    jpn: {
+      aliases: ["世宗", "湖", "音楽"],
+      tags: ["公演", "夏"],
+    },
+    chn: {
+      aliases: ["世宗", "湖", "音乐"],
+      tags: ["表演", "夏"],
+    },
+    fra: {
+      aliases: ["Sejong", "Lac", "Musique"],
+      tags: ["Spectacle", "Été"],
+    },
+    spa: {
+      aliases: ["Sejong", "Lago", "Música"],
+      tags: ["Espectáculo", "Verano"],
+    },
+    rus: {
+      aliases: ["Седжон", "Озеро", "Музыка"],
+      tags: ["Шоу", "Лето"],
+    },
   },
   "mock-festival-009": {
-    kor: ["수원", "화성", "역사", "전통", "공연"],
-    eng: ["Suwon", "Hwaseong", "History", "Traditional", "Performance"],
-    jpn: ["水原", "華城", "歴史", "伝統", "公演"],
-    chn: ["水原", "华城", "历史", "传统", "表演"],
-    fra: ["Suwon", "Hwaseong", "Histoire", "Tradition", "Spectacle"],
-    spa: ["Suwon", "Hwaseong", "Historia", "Tradición", "Espectáculo"],
-    rus: ["Сувон", "Хвасон", "История", "Традиция", "Шоу"],
+    kor: { aliases: ["수원", "화성", "역사"], tags: ["전통", "공연"] },
+    eng: {
+      aliases: ["Suwon", "Hwaseong", "History"],
+      tags: ["Traditional", "Performance"],
+    },
+    jpn: {
+      aliases: ["水原", "華城", "歴史"],
+      tags: ["伝統", "公演"],
+    },
+    chn: {
+      aliases: ["水原", "华城", "历史"],
+      tags: ["传统", "表演"],
+    },
+    fra: {
+      aliases: ["Suwon", "Hwaseong", "Histoire"],
+      tags: ["Tradition", "Spectacle"],
+    },
+    spa: {
+      aliases: ["Suwon", "Hwaseong", "Historia"],
+      tags: ["Tradición", "Espectáculo"],
+    },
+    rus: {
+      aliases: ["Сувон", "Хвасон", "История"],
+      tags: ["Традиция", "Шоу"],
+    },
   },
   "mock-festival-010": {
-    kor: ["춘천", "강원도", "호수", "별빛", "가을", "야경"],
-    eng: ["Chuncheon", "Gangwon", "Lake", "Starlight", "Autumn", "Night View"],
-    jpn: ["春川", "江原道", "湖", "星明かり", "秋", "夜景"],
-    chn: ["春川", "江原道", "湖", "星光", "秋", "夜景"],
-    fra: ["Chuncheon", "Gangwon", "Lac", "Clair de lune", "Automne", "Paysage nocturne"],
-    spa: ["Chuncheon", "Gangwon", "Lago", "Luz de las estrellas", "Otoño", "Paisaje nocturno"],
-    rus: ["Чхунчхон", "Канвондо", "Озеро", "Звёздный свет", "Осень", "Ночной пейзаж"],
+    kor: {
+      aliases: ["춘천", "호수", "별빛"],
+      tags: ["강원도", "가을", "야경"],
+    },
+    eng: {
+      aliases: ["Chuncheon", "Lake", "Starlight"],
+      tags: ["Gangwon", "Autumn", "Night View"],
+    },
+    jpn: {
+      aliases: ["春川", "湖", "星明かり"],
+      tags: ["江原道", "秋", "夜景"],
+    },
+    chn: {
+      aliases: ["春川", "湖", "星光"],
+      tags: ["江原道", "秋", "夜景"],
+    },
+    fra: {
+      aliases: ["Chuncheon", "Lac", "Clair de lune"],
+      tags: ["Gangwon", "Automne", "Paysage nocturne"],
+    },
+    spa: {
+      aliases: ["Chuncheon", "Lago", "Luz de las estrellas"],
+      tags: ["Gangwon", "Otoño", "Paisaje nocturno"],
+    },
+    rus: {
+      aliases: ["Чхунчхон", "Озеро", "Звёздный свет"],
+      tags: ["Канвондо", "Осень", "Ночной пейзаж"],
+    },
   },
   "mock-festival-011": {
-    kor: ["청주", "직지", "전통", "체험", "공연"],
-    eng: ["Cheongju", "Jikji", "Traditional", "Experience", "Performance"],
-    jpn: ["清州", "直指", "伝統", "体験", "公演"],
-    chn: ["清州", "直指", "传统", "体验", "表演"],
-    fra: ["Cheongju", "Jikji", "Tradition", "Expérience", "Spectacle"],
-    spa: ["Cheongju", "Jikji", "Tradición", "Experiencia", "Espectáculo"],
-    rus: ["Чхонджу", "Чикчи", "Традиция", "Опыт", "Шоу"],
+    kor: { aliases: ["청주", "직지"], tags: ["전통", "체험", "공연"] },
+    eng: {
+      aliases: ["Cheongju", "Jikji"],
+      tags: ["Traditional", "Experience", "Performance"],
+    },
+    jpn: {
+      aliases: ["清州", "直指"],
+      tags: ["伝統", "体験", "公演"],
+    },
+    chn: {
+      aliases: ["清州", "直指"],
+      tags: ["传统", "体验", "表演"],
+    },
+    fra: {
+      aliases: ["Cheongju", "Jikji"],
+      tags: ["Tradition", "Expérience", "Spectacle"],
+    },
+    spa: {
+      aliases: ["Cheongju", "Jikji"],
+      tags: ["Tradición", "Experiencia", "Espectáculo"],
+    },
+    rus: {
+      aliases: ["Чхонджу", "Чикчи"],
+      tags: ["Традиция", "Опыт", "Шоу"],
+    },
   },
   "mock-festival-012": {
-    kor: ["공주", "백제", "역사", "전통", "공연"],
-    eng: ["Gongju", "Baekje", "History", "Traditional", "Performance"],
-    jpn: ["公州", "百済", "歴史", "伝統", "公演"],
-    chn: ["公州", "百济", "历史", "传统", "表演"],
-    fra: ["Gongju", "Baekje", "Histoire", "Tradition", "Spectacle"],
-    spa: ["Gongju", "Baekje", "Historia", "Tradición", "Espectáculo"],
-    rus: ["Конджу", "Пэкче", "История", "Традиция", "Шоу"],
+    kor: { aliases: ["공주", "백제", "역사"], tags: ["전통", "공연"] },
+    eng: {
+      aliases: ["Gongju", "Baekje", "History"],
+      tags: ["Traditional", "Performance"],
+    },
+    jpn: {
+      aliases: ["公州", "百済", "歴史"],
+      tags: ["伝統", "公演"],
+    },
+    chn: {
+      aliases: ["公州", "百济", "历史"],
+      tags: ["传统", "表演"],
+    },
+    fra: {
+      aliases: ["Gongju", "Baekje", "Histoire"],
+      tags: ["Tradition", "Spectacle"],
+    },
+    spa: {
+      aliases: ["Gongju", "Baekje", "Historia"],
+      tags: ["Tradición", "Espectáculo"],
+    },
+    rus: {
+      aliases: ["Конджу", "Пэкче", "История"],
+      tags: ["Традиция", "Шоу"],
+    },
   },
   "mock-festival-013": {
-    kor: ["경주", "신라", "역사", "전통", "겨울"],
-    eng: ["Gyeongju", "Silla", "History", "Traditional", "Winter"],
-    jpn: ["慶州", "新羅", "歴史", "伝統", "冬"],
-    chn: ["庆州", "新罗", "历史", "传统", "冬"],
-    fra: ["Gyeongju", "Silla", "Histoire", "Tradition", "Hiver"],
-    spa: ["Gyeongju", "Silla", "Historia", "Tradición", "Invierno"],
-    rus: ["Кёнджу", "Силла", "История", "Традиция", "Зима"],
+    kor: { aliases: ["경주", "신라", "역사"], tags: ["전통", "겨울"] },
+    eng: {
+      aliases: ["Gyeongju", "Silla", "History"],
+      tags: ["Traditional", "Winter"],
+    },
+    jpn: {
+      aliases: ["慶州", "新羅", "歴史"],
+      tags: ["伝統", "冬"],
+    },
+    chn: {
+      aliases: ["庆州", "新罗", "历史"],
+      tags: ["传统", "冬"],
+    },
+    fra: {
+      aliases: ["Gyeongju", "Silla", "Histoire"],
+      tags: ["Tradition", "Hiver"],
+    },
+    spa: {
+      aliases: ["Gyeongju", "Silla", "Historia"],
+      tags: ["Tradición", "Invierno"],
+    },
+    rus: {
+      aliases: ["Кёнджу", "Силла", "История"],
+      tags: ["Традиция", "Зима"],
+    },
   },
   "mock-festival-014": {
-    kor: ["진주", "남강", "등불", "야경", "공연"],
-    eng: ["Jinju", "Namgang", "Lantern", "Night View", "Performance"],
-    jpn: ["晋州", "南江", "提灯", "夜景", "公演"],
-    chn: ["晋州", "南江", "灯笼", "夜景", "表演"],
-    fra: ["Jinju", "Namgang", "Lanternes", "Paysage nocturne", "Spectacle"],
-    spa: ["Jinju", "Namgang", "Faroles", "Paisaje nocturno", "Espectáculo"],
-    rus: ["Чинджу", "Намган", "Фонарь", "Ночной пейзаж", "Шоу"],
+    kor: { aliases: ["진주", "남강"], tags: ["등불", "야경", "공연"] },
+    eng: {
+      aliases: ["Jinju", "Namgang"],
+      tags: ["Lantern", "Night View", "Performance"],
+    },
+    jpn: {
+      aliases: ["晋州", "南江"],
+      tags: ["提灯", "夜景", "公演"],
+    },
+    chn: {
+      aliases: ["晋州", "南江"],
+      tags: ["灯笼", "夜景", "表演"],
+    },
+    fra: {
+      aliases: ["Jinju", "Namgang"],
+      tags: ["Lanternes", "Paysage nocturne", "Spectacle"],
+    },
+    spa: {
+      aliases: ["Jinju", "Namgang"],
+      tags: ["Faroles", "Paisaje nocturno", "Espectáculo"],
+    },
+    rus: {
+      aliases: ["Чинджу", "Намган"],
+      tags: ["Фонарь", "Ночной пейзаж", "Шоу"],
+    },
   },
   "mock-festival-015": {
-    kor: ["전주", "한옥", "전통", "문화", "가을"],
-    eng: ["Jeonju", "Hanok", "Traditional", "Culture", "Autumn"],
-    jpn: ["全州", "韓屋", "伝統", "文化", "秋"],
-    chn: ["全州", "韩屋", "传统", "文化", "秋"],
-    fra: ["Jeonju", "Hanok", "Tradition", "Culture", "Automne"],
-    spa: ["Jeonju", "Hanok", "Tradición", "Cultura", "Otoño"],
-    rus: ["Чонджу", "Ханок", "Традиция", "Культура", "Осень"],
+    kor: { aliases: ["전주", "한옥", "문화"], tags: ["전통", "가을"] },
+    eng: {
+      aliases: ["Jeonju", "Hanok", "Culture"],
+      tags: ["Traditional", "Autumn"],
+    },
+    jpn: {
+      aliases: ["全州", "韓屋", "文化"],
+      tags: ["伝統", "秋"],
+    },
+    chn: {
+      aliases: ["全州", "韩屋", "文化"],
+      tags: ["传统", "秋"],
+    },
+    fra: {
+      aliases: ["Jeonju", "Hanok", "Culture"],
+      tags: ["Tradition", "Automne"],
+    },
+    spa: {
+      aliases: ["Jeonju", "Hanok", "Cultura"],
+      tags: ["Tradición", "Otoño"],
+    },
+    rus: {
+      aliases: ["Чонджу", "Ханок", "Культура"],
+      tags: ["Традиция", "Осень"],
+    },
   },
   "mock-festival-016": {
-    kor: ["여수", "밤바다", "불꽃", "공연", "바다"],
-    eng: ["Yeosu", "Night Sea", "Fireworks", "Performance", "Sea"],
-    jpn: ["麗水", "夜の海", "花火", "公演", "海"],
-    chn: ["丽水", "夜海", "烟花", "表演", "海"],
-    fra: ["Yeosu", "Mer nocturne", "Feux d'artifice", "Spectacle", "Mer"],
-    spa: ["Yeosu", "Mar nocturno", "Fuegos artificiales", "Espectáculo", "Mar"],
-    rus: ["Йосу", "Ночное море", "Фейерверк", "Шоу", "Море"],
+    kor: { aliases: ["여수", "밤바다", "바다"], tags: ["불꽃", "공연"] },
+    eng: { aliases: ["Yeosu", "Night Sea", "Sea"], tags: ["Fireworks", "Performance"] },
+    jpn: { aliases: ["麗水", "夜の海", "海"], tags: ["花火", "公演"] },
+    chn: { aliases: ["丽水", "夜海", "海"], tags: ["烟花", "表演"] },
+    fra: {
+      aliases: ["Yeosu", "Mer nocturne", "Mer"],
+      tags: ["Feux d'artifice", "Spectacle"],
+    },
+    spa: {
+      aliases: ["Yeosu", "Mar nocturno", "Mar"],
+      tags: ["Fuegos artificiales", "Espectáculo"],
+    },
+    rus: {
+      aliases: ["Йосу", "Ночное море", "Море"],
+      tags: ["Фейерверк", "Шоу"],
+    },
   },
   "mock-festival-017": {
-    kor: ["목포", "항구", "음악", "가을", "음식"],
-    eng: ["Mokpo", "Port", "Music", "Autumn", "Food"],
-    jpn: ["木浦", "港", "音楽", "秋", "グルメ"],
-    chn: ["木浦", "港口", "音乐", "秋", "美食"],
-    fra: ["Mokpo", "Port", "Musique", "Automne", "Gastronomie"],
-    spa: ["Mokpo", "Puerto", "Música", "Otoño", "Gastronomía"],
-    rus: ["Мокпхо", "Порт", "Музыка", "Осень", "Еда"],
+    kor: { aliases: ["목포", "항구", "음악"], tags: ["가을", "음식"] },
+    eng: { aliases: ["Mokpo", "Port", "Music"], tags: ["Autumn", "Food"] },
+    jpn: { aliases: ["木浦", "港", "音楽"], tags: ["秋", "グルメ"] },
+    chn: { aliases: ["木浦", "港口", "音乐"], tags: ["秋", "美食"] },
+    fra: { aliases: ["Mokpo", "Port", "Musique"], tags: ["Automne", "Gastronomie"] },
+    spa: {
+      aliases: ["Mokpo", "Puerto", "Música"],
+      tags: ["Otoño", "Gastronomía"],
+    },
+    rus: { aliases: ["Мокпхо", "Порт", "Музыка"], tags: ["Осень", "Еда"] },
   },
   "mock-festival-018": {
-    kor: ["제주", "제주도", "해녀", "바다", "전통", "체험"],
-    eng: ["Jeju", "Jeju Island", "Haenyeo", "Sea", "Traditional", "Experience"],
-    jpn: ["済州", "済州島", "海女", "海", "伝統", "体験"],
-    chn: ["济州", "济州岛", "海女", "海", "传统", "体验"],
-    fra: ["Jeju", "Île de Jeju", "Haenyeo", "Mer", "Tradition", "Expérience"],
-    spa: ["Jeju", "Isla de Jeju", "Haenyeo", "Mar", "Tradición", "Experiencia"],
-    rus: ["Чеджу", "Остров Чеджу", "Хэнё", "Море", "Традиция", "Опыт"],
+    kor: { aliases: ["제주", "해녀", "바다"], tags: ["제주도", "전통", "체험"] },
+    eng: {
+      aliases: ["Jeju Island", "Haenyeo", "Sea"],
+      tags: ["Jeju", "Traditional", "Experience"],
+    },
+    jpn: {
+      aliases: ["済州", "海女", "海"],
+      tags: ["済州島", "伝統", "体験"],
+    },
+    chn: {
+      aliases: ["济州", "海女", "海"],
+      tags: ["济州岛", "传统", "体验"],
+    },
+    fra: {
+      aliases: ["Île de Jeju", "Haenyeo", "Mer"],
+      tags: ["Jeju", "Tradition", "Expérience"],
+    },
+    spa: {
+      aliases: ["Isla de Jeju", "Haenyeo", "Mar"],
+      tags: ["Jeju", "Tradición", "Experiencia"],
+    },
+    rus: {
+      aliases: ["Остров Чеджу", "Хэнё", "Море"],
+      tags: ["Чеджу", "Традиция", "Опыт"],
+    },
   },
 };
