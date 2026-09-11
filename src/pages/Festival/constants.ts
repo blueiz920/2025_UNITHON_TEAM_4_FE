@@ -1,5 +1,19 @@
 // src/pages/Festival/constants.ts
 
+import {
+  FESTIVAL_FILTER_KEYWORDS,
+  FESTIVAL_KEYWORD_IDS,
+  type FestivalKeywordId,
+  type FestivalKeywordLabels,
+} from "../../constants/festivalFilterKeywords";
+
+export {
+  FESTIVAL_FILTER_KEYWORDS,
+  FESTIVAL_KEYWORD_IDS,
+  type FestivalKeywordId,
+  type FestivalKeywordLabels,
+} from "../../constants/festivalFilterKeywords";
+
 export const sampleFestivals = [
   {
     id: "1",
@@ -158,21 +172,20 @@ export const seasons = [
   { value: "winter", label: "겨울 (12-2월)" },
 ];
 
-export const keywords = [
-  "봄",
-  "여름",
-  "가을",
-  "겨울",
-  "전통",
-  "체험",
-  "공연",
-  "음식",
-  "불꽃",
-  "등불",
-  "벚꽃",
-  "야경",
-  "서울",
-  "부산",
-  "제주도",
-  "강원도",
-];
+export const keywords = FESTIVAL_KEYWORD_IDS.map(
+  (id) => FESTIVAL_FILTER_KEYWORDS.kor[id],
+);
+
+export type FestivalKeywordOption = {
+  id: FestivalKeywordId;
+  label: string;
+};
+
+export function createFestivalKeywordOptions(
+  labels: FestivalKeywordLabels,
+): FestivalKeywordOption[] {
+  return FESTIVAL_KEYWORD_IDS.map((id) => ({
+    id,
+    label: labels[id],
+  }));
+}

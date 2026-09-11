@@ -8,10 +8,19 @@ import { FestivalGrid, Festival, DetailsMap } from "./components/FestivalGrid";
 import { FilterBar } from "./components/FilterBar";
 import { AppliedFilters } from "./components/AppliedFilters";
 import { FeaturedFestivalSlider } from "./components/FeaturedFestivalSlider";
-import { useInfiniteFestivalList, useInfiniteFestivalSearch } from "../../hooks/useFestivalList";
+import {
+  useInfiniteFestivalList,
+  useInfiniteFestivalSearch,
+  useFestivalSearchByKeywords,
+} from "../../hooks/useFestivalList";
 import { useBottomObserver } from "../../hooks/useBottomObserver";
 import { LoadingFestival } from "./LoadingFestival";
 import { useTranslation } from "react-i18next";
+import {
+  createFestivalKeywordOptions,
+  type FestivalKeywordId,
+  type FestivalKeywordLabels,
+} from "./constants";
 
 const areaCodeMap: Record<string, string> = {
   "1": "서울",
@@ -58,12 +67,21 @@ export default function FestivalPage() {
 
   const [tab, setTab] = useState<"all" | "featured" | "upcoming" | "ongoing">("ongoing");
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") ?? "");
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [selectedKeywordIds, setSelectedKeywordIds] = useState<FestivalKeywordId[]>([]);
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [selectedSeason, setSelectedSeason] = useState("all");
   const [detailsMap, setDetailsMap] = useState<DetailsMap>({});
   const [keywordFilterMode, setKeywordFilterMode] = useState<"AND" | "OR">("OR");
   const { t } = useTranslation();
+
+  const keywordLabels = t("festivalFilter.keywords", {
+    returnObjects: true,
+  }) as FestivalKeywordLabels;
+  const keywordOptions = createFestivalKeywordOptions(keywordLabels);
+  const selectedKeywords = selectedKeywordIds.flatMap((keywordId) => {
+    const keyword = keywordOptions.find((option) => option.id === keywordId);
+    return keyword ? [keyword.label] : [];
+  });
 
   useEffect(() => {
     setSearchQuery(searchParams.get("search") ?? "");
@@ -84,15 +102,21 @@ export default function FestivalPage() {
     eventEndDate,
   };
 
-  const isSearching = searchQuery.trim().length > 0 || selectedKeywords.length > 0;
+  const isSearching = searchQuery.trim().length > 0 || selectedKeywordIds.length > 0;
   const keyword = selectedKeywords[0] || searchQuery.trim() || "";
+  const isMultiKeywordSearch = selectedKeywordIds.length > 1;
 
-  const searchResult = useInfiniteFestivalSearch(keyword);
+  const searchResult = useInfiniteFestivalSearch(isMultiKeywordSearch ? "" : keyword);
+  const multiKeywordSearchResult = useFestivalSearchByKeywords(
+    selectedKeywords,
+    keywordFilterMode,
+    isMultiKeywordSearch,
+  );
   const listResult = useInfiniteFestivalList(filterParams);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = isSearching
-    ? searchResult
-    : listResult;
+  const activeSearchResult = isMultiKeywordSearch ? multiKeywordSearchResult : searchResult;
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
+    isSearching ? activeSearchResult : listResult;
 
   const isFestivalEnded = (eventenddate?: string): boolean => {
     const normalized = normalizeDateString(eventenddate);
@@ -109,14 +133,22 @@ export default function FestivalPage() {
       return [];
     });
 
-    const notEndedItems = allItems.filter((item) => {
+    const uniqueItems = isMultiKeywordSearch
+      ? Array.from(
+          new Map(
+            allItems.map((item) => [item.contentid, item]),
+          ).values(),
+        )
+      : allItems;
+
+    const notEndedItems = uniqueItems.filter((item) => {
       const eventEnd = detailsMap?.[item.contentid]?.eventenddate ?? item.eventenddate;
       return !isFestivalEnded(eventEnd);
     });
 
     const featuredIds = notEndedItems.slice(0, 5).map((item) => item.contentid);
 
-    return allItems.map((item) => {
+    return uniqueItems.map((item) => {
       const eventStart = detailsMap?.[item.contentid]?.eventstartdate ?? item.eventstartdate;
       const eventEnd = detailsMap?.[item.contentid]?.eventenddate ?? item.eventenddate;
       const ended = isFestivalEnded(eventEnd);
@@ -147,7 +179,7 @@ export default function FestivalPage() {
         featured: !ended && featuredIds.includes(item.contentid),
       };
     });
-  }, [data, detailsMap, t]);
+  }, [data, detailsMap, isMultiKeywordSearch, t]);
 
   const festivalsWithDetails: Festival[] = useMemo(
     () =>
@@ -163,16 +195,6 @@ export default function FestivalPage() {
 
   const filteredFestivals: Festival[] = useMemo(() => {
     let filtered = festivalsWithDetails;
-    if (selectedKeywords.length > 0) {
-      filtered = filtered.filter((festival) => {
-        const text = [festival.name, festival.description, ...(festival.keywords ?? [])]
-          .join(" ")
-          .toLowerCase();
-        return keywordFilterMode === "AND"
-          ? selectedKeywords.every((k) => text.includes(k.toLowerCase()))
-          : selectedKeywords.some((k) => text.includes(k.toLowerCase()));
-      });
-    }
     if (selectedRegion !== "all") {
       filtered = filtered.filter((festival) => festival.location.includes(selectedRegion));
     }
@@ -190,7 +212,7 @@ export default function FestivalPage() {
       );
     }
     return filtered;
-  }, [festivalsWithDetails, selectedKeywords, selectedRegion, selectedSeason, keywordFilterMode]);
+  }, [festivalsWithDetails, selectedRegion, selectedSeason]);
 
   const handleUpdateDetails: React.Dispatch<React.SetStateAction<DetailsMap>> = setDetailsMap;
 
@@ -198,20 +220,20 @@ export default function FestivalPage() {
     setSearchQuery("");
     setSelectedRegion("all");
     setSelectedSeason("all");
-    setSelectedKeywords([]);
+    setSelectedKeywordIds([]);
     setDetailsMap({});
     setTab("all");
   };
 
-  const handleApplyKeywords = (appliedKeywords: string[]) => {
-    setSelectedKeywords(appliedKeywords);
+  const handleApplyKeywords = (appliedKeywordIds: FestivalKeywordId[]) => {
+    setSelectedKeywordIds(appliedKeywordIds);
     setSearchQuery("");
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setSearchParams({ search: query });
-    setSelectedKeywords([]);
+    setSelectedKeywordIds([]);
   };
 
   const bottomRef = useBottomObserver(() => {
@@ -221,6 +243,7 @@ export default function FestivalPage() {
   const totalCount = useMemo(() => {
     if (!data) return 0;
     const firstPage = data.pages[0];
+    if (!firstPage) return 0;
     if (Array.isArray(firstPage)) return firstPage.length;
     if ("totalCount" in firstPage) return firstPage.totalCount;
     return 0;
@@ -255,7 +278,7 @@ export default function FestivalPage() {
           <AppliedFilters
             selectedRegion={selectedRegion}
             selectedSeason={selectedSeason}
-            selectedKeywords={selectedKeywords}
+            selectedKeywordIds={selectedKeywordIds}
             onReset={resetFilters}
           />
         </div>
@@ -267,7 +290,7 @@ export default function FestivalPage() {
             onRegionChange={setSelectedRegion}
             selectedSeason={selectedSeason}
             onSeasonChange={setSelectedSeason}
-            selectedKeywords={selectedKeywords}
+            selectedKeywordIds={selectedKeywordIds}
             onApplyKeywords={handleApplyKeywords}
             onReset={resetFilters}
             keywordFilterMode={keywordFilterMode}
@@ -275,7 +298,7 @@ export default function FestivalPage() {
           />
         </div>
 
-        {!(searchQuery.trim().length > 0 || selectedKeywords.length > 0) && (
+        {!(searchQuery.trim().length > 0 || selectedKeywordIds.length > 0) && (
           <Tabs value={tab} onValueChange={setTab as (value: string) => void}>
             <TabsList>
               <TabsTrigger value="all">{t("festival.allTab")}</TabsTrigger>

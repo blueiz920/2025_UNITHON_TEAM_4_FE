@@ -129,24 +129,6 @@
     "invalid": "La recherche n'est pas possible avec seulement des consonnes/voyelles coréennes ou des espaces. Veuillez entrer plus de détails."
   },
   "festivalFilter": {
-    "keywords": [
-      "Printemps",
-      "Été",
-      "Automne",
-      "Hiver",
-      "Tradition",
-      "Expérience",
-      "Spectacle",
-      "Gastronomie",
-      "Feux d'artifice",
-      "Lanternes",
-      "Cerisiers",
-      "Paysage nocturne",
-      "Séoul",
-      "Busan",
-      "Jeju",
-      "Gangwon"
-    ],
     "filter": "Filtrer",
     "filterApplied": "Filtre appliqué",
     "reset": "Réinitialiser",

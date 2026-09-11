@@ -211,24 +211,6 @@
     "invalid": "You can't search using only consonants, vowels, or spaces. Please enter a more specific query."
   },
   "festivalFilter": {
-    "keywords": [
-      "Spring",
-      "Summer",
-      "Autumn",
-      "Winter",
-      "Traditional",
-      "Experience",
-      "Performance",
-      "Food",
-      "Fireworks",
-      "Lantern",
-      "Cherry Blossom",
-      "Night View",
-      "Seoul",
-      "Busan",
-      "Jeju",
-      "Gangwon"
-    ],
     "filter": "Filter",
     "filterApplied": "Filter Applied",
     "reset": "Reset",

@@ -13,6 +13,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "../components/Popover";
 //   SelectValue,
 // } from "../components/Select";
 import { SearchBar } from "../components/SearchBar";
+import {
+  createFestivalKeywordOptions,
+  type FestivalKeywordId,
+  type FestivalKeywordLabels,
+} from "../constants";
 // import { keywords } from "../constants";
 import { useTranslation } from 'react-i18next';
 // AND/OR 토글 버튼
@@ -54,8 +59,8 @@ interface FilterBarProps {
   onRegionChange: (region: string) => void;
   selectedSeason: string;
   onSeasonChange: (season: string) => void;
-  selectedKeywords: string[];
-  onApplyKeywords: (appliedKeywords: string[]) => void;
+  selectedKeywordIds: FestivalKeywordId[];
+  onApplyKeywords: (appliedKeywordIds: FestivalKeywordId[]) => void;
   onReset: () => void;
   keywordFilterMode: "AND" | "OR";
   onKeywordFilterModeChange: (mode: "AND" | "OR") => void;
@@ -68,7 +73,7 @@ export function FilterBar({
   // onRegionChange,
   selectedSeason,
   // onSeasonChange,
-  selectedKeywords,
+  selectedKeywordIds,
   onApplyKeywords,
   onReset,
   keywordFilterMode,
@@ -76,29 +81,37 @@ export function FilterBar({
 }: FilterBarProps) {
   const { t } = useTranslation();
   // "적용 전" draft 상태 관리
-  const [selectedKeywordsDraft, setSelectedKeywordsDraft] = useState<string[]>(selectedKeywords);
+  const [selectedKeywordIdsDraft, setSelectedKeywordIdsDraft] = useState<FestivalKeywordId[]>(
+    selectedKeywordIds,
+  );
 
-  const keywords = t("festivalFilter.keywords", { returnObjects: true }) as string[];
+  const keywordLabels = t("festivalFilter.keywords", {
+    returnObjects: true,
+  }) as FestivalKeywordLabels;
+  const keywordOptions = createFestivalKeywordOptions(keywordLabels);
+
   // 부모가 바뀌면 draft도 맞춰서 동기화
   useEffect(() => {
-    setSelectedKeywordsDraft(selectedKeywords);
-  }, [selectedKeywords]);
+    setSelectedKeywordIdsDraft(selectedKeywordIds);
+  }, [selectedKeywordIds]);
 
   const hasFilter =
-    selectedRegion !== "all" || selectedSeason !== "all" || selectedKeywords.length > 0;
+    selectedRegion !== "all" || selectedSeason !== "all" || selectedKeywordIds.length > 0;
 
-  const handleBadgeClick = (keyword: string) => {
-    setSelectedKeywordsDraft((prev) =>
-      prev.includes(keyword) ? prev.filter((k) => k !== keyword) : [...prev, keyword]
+  const handleBadgeClick = (keywordId: FestivalKeywordId) => {
+    setSelectedKeywordIdsDraft((prev) =>
+      prev.includes(keywordId)
+        ? prev.filter((id) => id !== keywordId)
+        : [...prev, keywordId],
     );
   };
 
   const handleApply = () => {
-    onApplyKeywords(selectedKeywordsDraft);
+    onApplyKeywords(selectedKeywordIdsDraft);
   };
 
   const handleReset = () => {
-    setSelectedKeywordsDraft([]);
+    setSelectedKeywordIdsDraft([]);
     onReset();
   };
 
@@ -169,12 +182,14 @@ export function FilterBar({
               </div>
               {/* --- 검색 기준 키워드 구역 --- */}
               <div className="flex flex-wrap items-center gap-1 mb-2 min-h-6">
-                {selectedKeywordsDraft.length > 0 && (
+                {selectedKeywordIdsDraft.length > 0 && (
                   <>
                     <span className="font-bold text-xs text-gray-500 mr-1">{t("festivalFilter.searchBasis")} </span>
-                    <Badge className="bg-[#ff651b] text-white">{selectedKeywordsDraft[0]}</Badge>
-                    {selectedKeywordsDraft.slice(1).map((k, idx) => (
-                      <span key={k} className="flex items-center">
+                    <Badge className="bg-[#ff651b] text-white">
+                      {keywordOptions.find((option) => option.id === selectedKeywordIdsDraft[0])?.label}
+                    </Badge>
+                    {selectedKeywordIdsDraft.slice(1).map((id, idx) => (
+                      <span key={id} className="flex items-center">
                         <span className="mx-1 text-xs font-bold text-gray-400">
                           {keywordFilterMode === "AND"
                             ? idx === 0
@@ -182,7 +197,9 @@ export function FilterBar({
                               : "," // 그 뒤에는 ,
                             : "or"}
                         </span>
-                        <Badge className="bg-gray-200 text-gray-700">{k}</Badge>
+                        <Badge className="bg-gray-200 text-gray-700">
+                          {keywordOptions.find((option) => option.id === id)?.label}
+                        </Badge>
                       </span>
                     ))}
                   </>
@@ -190,18 +207,18 @@ export function FilterBar({
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {keywords.map((keyword) => (
+                {keywordOptions.map(({ id, label }) => (
                   <Badge
-                    key={keyword}
-                    variant={selectedKeywordsDraft.includes(keyword) ? "default" : "outline"}
+                    key={id}
+                    variant={selectedKeywordIdsDraft.includes(id) ? "default" : "outline"}
                     className={`cursor-pointer ${
-                      selectedKeywordsDraft.includes(keyword)
+                      selectedKeywordIdsDraft.includes(id)
                         ? "bg-[#ff651b] hover:bg-[#ff651b]"
                         : "hover:bg-gray-300 text-gray-500"
                     }`}
-                    onClick={() => handleBadgeClick(keyword)}
+                    onClick={() => handleBadgeClick(id)}
                   >
-                    {keyword}
+                    {label}
                   </Badge>
                 ))}
               </div>
@@ -215,7 +232,7 @@ export function FilterBar({
                 size="sm"
                 className="bg-[#ff651b] hover:bg-[#ff651b]/90 text-[#fffefb]"
                 onClick={handleApply}
-                disabled={selectedKeywordsDraft.length === 0}
+                disabled={selectedKeywordIdsDraft.length === 0}
               >
                 {t("festivalFilter.apply")}
               </Button>
