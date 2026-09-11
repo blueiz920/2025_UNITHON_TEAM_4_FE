@@ -163,7 +163,7 @@ export default function FestivalPage() {
 
   const filteredFestivals: Festival[] = useMemo(() => {
     let filtered = festivalsWithDetails;
-    if (selectedKeywords.length > 0) {
+    if (selectedKeywords.length > 1) {
       filtered = filtered.filter((festival) => {
         const text = [festival.name, festival.description, ...(festival.keywords ?? [])]
           .join(" ")
