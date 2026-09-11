@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLangStore } from "../libraries/stores/langStore";
 import {
   fetchFestivalInfo,
@@ -113,11 +113,17 @@ export function useFestivalSearchByKeywords(
     new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean)),
   ).sort();
   const normalizedKeywordKey = normalizedKeywords.join("\u0000");
-  const [visiblePage, setVisiblePage] = useState(1);
+  const paginationKey = [normalizedKeywordKey, mode, lang].join("\u0001");
+  const [pagination, setPagination] = useState({
+    key: paginationKey,
+    page: 1,
+  });
 
-  useEffect(() => {
-    setVisiblePage(1);
-  }, [normalizedKeywordKey, mode, lang]);
+  if (pagination.key !== paginationKey) {
+    setPagination({ key: paginationKey, page: 1 });
+  }
+
+  const visiblePage = pagination.key === paginationKey ? pagination.page : 1;
 
   const query = useQuery<FestivalSearchPage>({
     queryKey: ["festivalSearchByKeywords", normalizedKeywords, mode, lang],
@@ -142,7 +148,13 @@ export function useFestivalSearchByKeywords(
 
   const fetchNextPage = () => {
     if (hasNextPage) {
-      setVisiblePage((page) => page + 1);
+      setPagination((previousPagination) => ({
+        key: paginationKey,
+        page:
+          previousPagination.key === paginationKey
+            ? previousPagination.page + 1
+            : 2,
+      }));
     }
   };
 
