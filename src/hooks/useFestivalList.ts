@@ -88,8 +88,16 @@ export function useInfiniteFestivalSearch(keyword: string) {
     queryKey: ["festivalSearchInfinite", keyword, lang],
     queryFn: ({ pageParam = 1 }) => fetchFestivalSearch(keyword, lang, pageParam as number),
     enabled: !!keyword,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.item.length === 8 ? allPages.length + 1 : undefined,
+    getNextPageParam: (lastPage, allPages) => {
+      const loadedCount = allPages.reduce(
+        (total, page) => total + page.item.length,
+        0,
+      );
+
+      return loadedCount < lastPage.totalCount
+        ? allPages.length + 1
+        : undefined;
+    },
     initialPageParam: 1,
     staleTime: 1000 * 60,
   });
