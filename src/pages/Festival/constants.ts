@@ -176,3 +176,36 @@ export const keywords = [
   "제주도",
   "강원도",
 ];
+
+export const FESTIVAL_KEYWORD_IDS = [
+  "spring",
+  "summer",
+  "autumn",
+  "winter",
+  "traditional",
+  "experience",
+  "performance",
+  "food",
+  "fireworks",
+  "lantern",
+  "cherryBlossom",
+  "nightView",
+  "seoul",
+  "busan",
+  "jeju",
+  "gangwon",
+] as const;
+
+export type FestivalKeywordId = (typeof FESTIVAL_KEYWORD_IDS)[number];
+
+export type FestivalKeywordOption = {
+  id: FestivalKeywordId;
+  label: string;
+};
+
+export function createFestivalKeywordOptions(labels: string[]): FestivalKeywordOption[] {
+  return FESTIVAL_KEYWORD_IDS.flatMap((id, index) => {
+    const label = labels[index];
+    return label ? [{ id, label }] : [];
+  });
+}

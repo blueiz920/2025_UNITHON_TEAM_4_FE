@@ -3,12 +3,17 @@
 import { MapPin, Calendar } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/Badge";
-import { regions, seasons } from "../constants";
+import {
+  createFestivalKeywordOptions,
+  regions,
+  seasons,
+  type FestivalKeywordId,
+} from "../constants";
 import { useTranslation } from 'react-i18next';
 interface AppliedFiltersProps {
   selectedRegion: string;
   selectedSeason: string;
-  selectedKeywords: string[];
+  selectedKeywordIds: FestivalKeywordId[];
   onReset: () => void;
   // (옵션: onRemoveKeyword, onRemoveRegion 등 추가로 지원 가능)
 }
@@ -16,12 +21,14 @@ interface AppliedFiltersProps {
 export function AppliedFilters({
   selectedRegion,
   selectedSeason,
-  selectedKeywords,
+  selectedKeywordIds,
   onReset,
 }: AppliedFiltersProps) {
   const hasAny =
-    selectedRegion !== "all" || selectedSeason !== "all" || selectedKeywords.length > 0;
+    selectedRegion !== "all" || selectedSeason !== "all" || selectedKeywordIds.length > 0;
   const { t } = useTranslation();
+  const keywordLabels = t("festivalFilter.keywords", { returnObjects: true }) as string[];
+  const keywordOptions = createFestivalKeywordOptions(keywordLabels);
   if (!hasAny) return null;
 
   return (
@@ -39,11 +46,16 @@ export function AppliedFilters({
           {seasons.find((s) => s.value === selectedSeason)?.label}
         </Badge>
       )}
-      {selectedKeywords.map((keyword) => (
-        <Badge key={keyword} variant="outline" className="flex bg-[#ff651b]/90 items-center gap-1">
-          {keyword}
-        </Badge>
-      ))}
+      {selectedKeywordIds.map((keywordId) => {
+        const keyword = keywordOptions.find((option) => option.id === keywordId);
+        if (!keyword) return null;
+
+        return (
+          <Badge key={keywordId} variant="outline" className="flex bg-[#ff651b]/90 items-center gap-1">
+            {keyword.label}
+          </Badge>
+        );
+      })}
       <Button variant="ghost" size="sm" className="h-6 text-xs text-gray-500" onClick={onReset}>
         {t("festivalAppliedFilter.resetFilters")}
       </Button>

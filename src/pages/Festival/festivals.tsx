@@ -16,6 +16,10 @@ import {
 import { useBottomObserver } from "../../hooks/useBottomObserver";
 import { LoadingFestival } from "./LoadingFestival";
 import { useTranslation } from "react-i18next";
+import {
+  createFestivalKeywordOptions,
+  type FestivalKeywordId,
+} from "./constants";
 
 const areaCodeMap: Record<string, string> = {
   "1": "서울",
@@ -62,12 +66,19 @@ export default function FestivalPage() {
 
   const [tab, setTab] = useState<"all" | "featured" | "upcoming" | "ongoing">("ongoing");
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") ?? "");
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [selectedKeywordIds, setSelectedKeywordIds] = useState<FestivalKeywordId[]>([]);
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [selectedSeason, setSelectedSeason] = useState("all");
   const [detailsMap, setDetailsMap] = useState<DetailsMap>({});
   const [keywordFilterMode, setKeywordFilterMode] = useState<"AND" | "OR">("OR");
   const { t } = useTranslation();
+
+  const keywordLabels = t("festivalFilter.keywords", { returnObjects: true }) as string[];
+  const keywordOptions = createFestivalKeywordOptions(keywordLabels);
+  const selectedKeywords = selectedKeywordIds.flatMap((keywordId) => {
+    const keyword = keywordOptions.find((option) => option.id === keywordId);
+    return keyword ? [keyword.label] : [];
+  });
 
   useEffect(() => {
     setSearchQuery(searchParams.get("search") ?? "");
@@ -88,9 +99,9 @@ export default function FestivalPage() {
     eventEndDate,
   };
 
-  const isSearching = searchQuery.trim().length > 0 || selectedKeywords.length > 0;
+  const isSearching = searchQuery.trim().length > 0 || selectedKeywordIds.length > 0;
   const keyword = selectedKeywords[0] || searchQuery.trim() || "";
-  const isMultiKeywordSearch = selectedKeywords.length > 1;
+  const isMultiKeywordSearch = selectedKeywordIds.length > 1;
 
   const searchResult = useInfiniteFestivalSearch(isMultiKeywordSearch ? "" : keyword);
   const multiKeywordSearchResult = useFestivalSearchByKeywords(
@@ -206,20 +217,20 @@ export default function FestivalPage() {
     setSearchQuery("");
     setSelectedRegion("all");
     setSelectedSeason("all");
-    setSelectedKeywords([]);
+    setSelectedKeywordIds([]);
     setDetailsMap({});
     setTab("all");
   };
 
-  const handleApplyKeywords = (appliedKeywords: string[]) => {
-    setSelectedKeywords(appliedKeywords);
+  const handleApplyKeywords = (appliedKeywordIds: FestivalKeywordId[]) => {
+    setSelectedKeywordIds(appliedKeywordIds);
     setSearchQuery("");
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setSearchParams({ search: query });
-    setSelectedKeywords([]);
+    setSelectedKeywordIds([]);
   };
 
   const bottomRef = useBottomObserver(() => {
@@ -264,7 +275,7 @@ export default function FestivalPage() {
           <AppliedFilters
             selectedRegion={selectedRegion}
             selectedSeason={selectedSeason}
-            selectedKeywords={selectedKeywords}
+            selectedKeywordIds={selectedKeywordIds}
             onReset={resetFilters}
           />
         </div>
@@ -276,7 +287,7 @@ export default function FestivalPage() {
             onRegionChange={setSelectedRegion}
             selectedSeason={selectedSeason}
             onSeasonChange={setSelectedSeason}
-            selectedKeywords={selectedKeywords}
+            selectedKeywordIds={selectedKeywordIds}
             onApplyKeywords={handleApplyKeywords}
             onReset={resetFilters}
             keywordFilterMode={keywordFilterMode}
@@ -284,7 +295,7 @@ export default function FestivalPage() {
           />
         </div>
 
-        {!(searchQuery.trim().length > 0 || selectedKeywords.length > 0) && (
+        {!(searchQuery.trim().length > 0 || selectedKeywordIds.length > 0) && (
           <Tabs value={tab} onValueChange={setTab as (value: string) => void}>
             <TabsList>
               <TabsTrigger value="all">{t("festival.allTab")}</TabsTrigger>
