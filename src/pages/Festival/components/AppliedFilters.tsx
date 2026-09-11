@@ -8,6 +8,7 @@ import {
   regions,
   seasons,
   type FestivalKeywordId,
+  type FestivalKeywordLabels,
 } from "../constants";
 import { useTranslation } from 'react-i18next';
 interface AppliedFiltersProps {
@@ -27,7 +28,9 @@ export function AppliedFilters({
   const hasAny =
     selectedRegion !== "all" || selectedSeason !== "all" || selectedKeywordIds.length > 0;
   const { t } = useTranslation();
-  const keywordLabels = t("festivalFilter.keywords", { returnObjects: true }) as string[];
+  const keywordLabels = t("festivalFilter.keywords", {
+    returnObjects: true,
+  }) as FestivalKeywordLabels;
   const keywordOptions = createFestivalKeywordOptions(keywordLabels);
   if (!hasAny) return null;
 

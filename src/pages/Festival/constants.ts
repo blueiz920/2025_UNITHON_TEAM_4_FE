@@ -198,14 +198,18 @@ export const FESTIVAL_KEYWORD_IDS = [
 
 export type FestivalKeywordId = (typeof FESTIVAL_KEYWORD_IDS)[number];
 
+export type FestivalKeywordLabels = Record<FestivalKeywordId, string>;
+
 export type FestivalKeywordOption = {
   id: FestivalKeywordId;
   label: string;
 };
 
-export function createFestivalKeywordOptions(labels: string[]): FestivalKeywordOption[] {
-  return FESTIVAL_KEYWORD_IDS.flatMap((id, index) => {
-    const label = labels[index];
-    return label ? [{ id, label }] : [];
-  });
+export function createFestivalKeywordOptions(
+  labels: FestivalKeywordLabels,
+): FestivalKeywordOption[] {
+  return FESTIVAL_KEYWORD_IDS.map((id) => ({
+    id,
+    label: labels[id],
+  }));
 }

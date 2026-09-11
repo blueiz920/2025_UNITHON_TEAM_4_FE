@@ -16,6 +16,7 @@ import { SearchBar } from "../components/SearchBar";
 import {
   createFestivalKeywordOptions,
   type FestivalKeywordId,
+  type FestivalKeywordLabels,
 } from "../constants";
 // import { keywords } from "../constants";
 import { useTranslation } from 'react-i18next';
@@ -84,7 +85,9 @@ export function FilterBar({
     selectedKeywordIds,
   );
 
-  const keywordLabels = t("festivalFilter.keywords", { returnObjects: true }) as string[];
+  const keywordLabels = t("festivalFilter.keywords", {
+    returnObjects: true,
+  }) as FestivalKeywordLabels;
   const keywordOptions = createFestivalKeywordOptions(keywordLabels);
 
   // 부모가 바뀌면 draft도 맞춰서 동기화

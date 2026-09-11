@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import {
   createFestivalKeywordOptions,
   type FestivalKeywordId,
+  type FestivalKeywordLabels,
 } from "./constants";
 
 const areaCodeMap: Record<string, string> = {
@@ -73,7 +74,9 @@ export default function FestivalPage() {
   const [keywordFilterMode, setKeywordFilterMode] = useState<"AND" | "OR">("OR");
   const { t } = useTranslation();
 
-  const keywordLabels = t("festivalFilter.keywords", { returnObjects: true }) as string[];
+  const keywordLabels = t("festivalFilter.keywords", {
+    returnObjects: true,
+  }) as FestivalKeywordLabels;
   const keywordOptions = createFestivalKeywordOptions(keywordLabels);
   const selectedKeywords = selectedKeywordIds.flatMap((keywordId) => {
     const keyword = keywordOptions.find((option) => option.id === keywordId);
