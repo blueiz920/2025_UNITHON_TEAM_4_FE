@@ -8,7 +8,11 @@ import { FestivalGrid, Festival, DetailsMap } from "./components/FestivalGrid";
 import { FilterBar } from "./components/FilterBar";
 import { AppliedFilters } from "./components/AppliedFilters";
 import { FeaturedFestivalSlider } from "./components/FeaturedFestivalSlider";
-import { useInfiniteFestivalList, useInfiniteFestivalSearch } from "../../hooks/useFestivalList";
+import {
+  useInfiniteFestivalList,
+  useInfiniteFestivalSearch,
+  useInfiniteFestivalSearchByKeywords,
+} from "../../hooks/useFestivalList";
 import { useBottomObserver } from "../../hooks/useBottomObserver";
 import { LoadingFestival } from "./LoadingFestival";
 import { useTranslation } from "react-i18next";
@@ -86,13 +90,18 @@ export default function FestivalPage() {
 
   const isSearching = searchQuery.trim().length > 0 || selectedKeywords.length > 0;
   const keyword = selectedKeywords[0] || searchQuery.trim() || "";
+  const isMultiKeywordOr = selectedKeywords.length > 1 && keywordFilterMode === "OR";
 
-  const searchResult = useInfiniteFestivalSearch(keyword);
+  const searchResult = useInfiniteFestivalSearch(isMultiKeywordOr ? "" : keyword);
+  const multiKeywordSearchResult = useInfiniteFestivalSearchByKeywords(
+    selectedKeywords,
+    isMultiKeywordOr,
+  );
   const listResult = useInfiniteFestivalList(filterParams);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = isSearching
-    ? searchResult
-    : listResult;
+  const activeSearchResult = isMultiKeywordOr ? multiKeywordSearchResult : searchResult;
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
+    isSearching ? activeSearchResult : listResult;
 
   const isFestivalEnded = (eventenddate?: string): boolean => {
     const normalized = normalizeDateString(eventenddate);
@@ -109,14 +118,22 @@ export default function FestivalPage() {
       return [];
     });
 
-    const notEndedItems = allItems.filter((item) => {
+    const uniqueItems = isMultiKeywordOr
+      ? Array.from(
+          new Map(
+            allItems.map((item) => [item.contentid, item]),
+          ).values(),
+        )
+      : allItems;
+
+    const notEndedItems = uniqueItems.filter((item) => {
       const eventEnd = detailsMap?.[item.contentid]?.eventenddate ?? item.eventenddate;
       return !isFestivalEnded(eventEnd);
     });
 
     const featuredIds = notEndedItems.slice(0, 5).map((item) => item.contentid);
 
-    return allItems.map((item) => {
+    return uniqueItems.map((item) => {
       const eventStart = detailsMap?.[item.contentid]?.eventstartdate ?? item.eventstartdate;
       const eventEnd = detailsMap?.[item.contentid]?.eventenddate ?? item.eventenddate;
       const ended = isFestivalEnded(eventEnd);
@@ -147,7 +164,7 @@ export default function FestivalPage() {
         featured: !ended && featuredIds.includes(item.contentid),
       };
     });
-  }, [data, detailsMap, t]);
+  }, [data, detailsMap, isMultiKeywordOr, t]);
 
   const festivalsWithDetails: Festival[] = useMemo(
     () =>
@@ -163,7 +180,7 @@ export default function FestivalPage() {
 
   const filteredFestivals: Festival[] = useMemo(() => {
     let filtered = festivalsWithDetails;
-    if (selectedKeywords.length > 1) {
+    if (selectedKeywords.length > 1 && keywordFilterMode === "AND") {
       filtered = filtered.filter((festival) => {
         const text = [festival.name, festival.description, ...(festival.keywords ?? [])]
           .join(" ")
@@ -220,11 +237,19 @@ export default function FestivalPage() {
 
   const totalCount = useMemo(() => {
     if (!data) return 0;
+    if (isMultiKeywordOr) {
+      const allItems = data.pages.flatMap((page) => {
+        if (Array.isArray(page)) return page;
+        if ("item" in page) return page.item;
+        return [];
+      });
+      return new Set(allItems.map((item) => item.contentid)).size;
+    }
     const firstPage = data.pages[0];
     if (Array.isArray(firstPage)) return firstPage.length;
     if ("totalCount" in firstPage) return firstPage.totalCount;
     return 0;
-  }, [data]);
+  }, [data, isMultiKeywordOr]);
 
   if (isLoading) return <LoadingFestival />;
   if (isError)

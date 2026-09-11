@@ -39,6 +39,49 @@ export function useInfiniteFestivalSearch(keyword: string) {
   });
 }
 
+export function useInfiniteFestivalSearchByKeywords(
+  keywords: string[],
+  enabled: boolean,
+) {
+  const lang = useLangStore((state) => state.lang);
+  const normalizedKeywords = Array.from(
+    new Set(keywords.map((keyword) => keyword.trim()).filter(Boolean)),
+  ).sort();
+
+  return useInfiniteQuery<{
+    item: FestivalListItem[];
+    totalCount: number;
+    hasNextPage: boolean;
+  }>({
+    queryKey: ["festivalSearchInfiniteOr", normalizedKeywords, lang],
+    queryFn: async ({ pageParam = 1 }) => {
+      const responses = await Promise.all(
+        normalizedKeywords.map((keyword) =>
+          fetchFestivalSearch(keyword, lang, pageParam as number),
+        ),
+      );
+      const item = Array.from(
+        new Map(
+          responses
+            .flatMap((response) => response.item)
+            .map((festival) => [festival.contentid, festival]),
+        ).values(),
+      );
+
+      return {
+        item,
+        totalCount: item.length,
+        hasNextPage: responses.some((response) => response.item.length === 8),
+      };
+    },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.hasNextPage ? allPages.length + 1 : undefined,
+    initialPageParam: 1,
+    enabled: enabled && normalizedKeywords.length > 1,
+    staleTime: 1000 * 60,
+  });
+}
+
 // 소개(overview)/info
 export function useFestivalOverview(contentId?: string) {
   const lang = useLangStore((state) => state.lang);
