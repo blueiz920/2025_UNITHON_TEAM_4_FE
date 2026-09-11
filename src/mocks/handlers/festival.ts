@@ -1,6 +1,12 @@
 import { http, HttpResponse, passthrough } from "msw";
 import type { FestivalListResponse } from "../../types/festival";
 import { mockFestivals } from "../data/festivals";
+import {
+  DEFAULT_FESTIVAL_SEARCH_LANGUAGE,
+  festivalSearchAliases,
+  isFestivalSearchLanguage,
+} from "../data/festivalSearchAliases";
+import type { FestivalSearchLanguage } from "../data/festivalSearchAliases";
 
 const DEFAULT_PAGE_NO = 1;
 const DEFAULT_NUM_OF_ROWS = 8;
@@ -82,9 +88,13 @@ function normalizeKeyword(value: string | null) {
 
 function getFestivalSearchParams(request: Request) {
   const requestUrl = new URL(request.url);
+  const requestedLanguage = requestUrl.searchParams.get("lang")?.trim() ?? null;
 
   return {
     keyword: normalizeKeyword(requestUrl.searchParams.get("keyword")),
+    lang: isFestivalSearchLanguage(requestedLanguage)
+      ? requestedLanguage
+      : DEFAULT_FESTIVAL_SEARCH_LANGUAGE,
     pageNo: parsePositiveInteger(requestUrl.searchParams.get("pageNo"), DEFAULT_PAGE_NO),
     numOfRows: parsePositiveInteger(
       requestUrl.searchParams.get("numOfRows"),
@@ -93,22 +103,24 @@ function getFestivalSearchParams(request: Request) {
   };
 }
 
-function createFestivalSearchResponse(request: Request) {
-  const { keyword, pageNo, numOfRows } = getFestivalSearchParams(request);
-  const filteredFestivals = keyword
-    ? mockFestivals.filter((festival) => {
-        const searchableText = [
-          festival.title,
-          festival.overview,
-          festival.addr1,
-          festival.addr2,
-        ]
-          .filter((value): value is string => Boolean(value))
-          .join(" ")
-          .toLowerCase();
+function getFestivalSearchableText(
+  festival: (typeof mockFestivals)[number],
+  lang: FestivalSearchLanguage,
+) {
+  const aliases = festivalSearchAliases[festival.contentid]?.[lang] ?? [];
 
-        return searchableText.includes(keyword);
-      })
+  return [festival.title, festival.overview, festival.addr1, festival.addr2, ...aliases]
+    .filter((value): value is string => Boolean(value))
+    .join(" ")
+    .toLowerCase();
+}
+
+function createFestivalSearchResponse(request: Request) {
+  const { keyword, lang, pageNo, numOfRows } = getFestivalSearchParams(request);
+  const filteredFestivals = keyword
+    ? mockFestivals.filter((festival) =>
+        getFestivalSearchableText(festival, lang).includes(keyword),
+      )
     : mockFestivals;
   const startIndex = (pageNo - 1) * numOfRows;
   const item = filteredFestivals.slice(startIndex, startIndex + numOfRows);
