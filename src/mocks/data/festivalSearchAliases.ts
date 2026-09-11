@@ -1,14 +1,12 @@
-export const FESTIVAL_SEARCH_LANGUAGES = [
-  "kor",
-  "eng",
-  "jpn",
-  "chn",
-  "fra",
-  "spa",
-  "rus",
-] as const;
+import {
+  FESTIVAL_FILTER_KEYWORDS,
+  FESTIVAL_FILTER_LANGUAGES,
+  type FestivalFilterLanguage,
+} from "../../constants/festivalFilterKeywords";
 
-export type FestivalSearchLanguage = (typeof FESTIVAL_SEARCH_LANGUAGES)[number];
+export const FESTIVAL_SEARCH_LANGUAGES = FESTIVAL_FILTER_LANGUAGES;
+
+export type FestivalSearchLanguage = FestivalFilterLanguage;
 
 export const DEFAULT_FESTIVAL_SEARCH_LANGUAGE: FestivalSearchLanguage = "kor";
 
@@ -28,138 +26,6 @@ type FestivalSearchAliases = Record<
   FestivalSearchTerms
 >;
 
-const FESTIVAL_FILTER_TERMS: Record<
-  FestivalSearchLanguage,
-  readonly string[]
-> = {
-  kor: [
-    "봄",
-    "여름",
-    "가을",
-    "겨울",
-    "전통",
-    "체험",
-    "공연",
-    "음식",
-    "불꽃",
-    "등불",
-    "벚꽃",
-    "야경",
-    "서울",
-    "부산",
-    "제주도",
-    "강원도",
-  ],
-  eng: [
-    "Spring",
-    "Summer",
-    "Autumn",
-    "Winter",
-    "Traditional",
-    "Experience",
-    "Performance",
-    "Food",
-    "Fireworks",
-    "Lantern",
-    "Cherry Blossom",
-    "Night View",
-    "Seoul",
-    "Busan",
-    "Jeju",
-    "Gangwon",
-  ],
-  jpn: [
-    "春",
-    "夏",
-    "秋",
-    "冬",
-    "伝統",
-    "体験",
-    "公演",
-    "グルメ",
-    "花火",
-    "提灯",
-    "桜",
-    "夜景",
-    "ソウル",
-    "釜山",
-    "済州島",
-    "江原道",
-  ],
-  chn: [
-    "春",
-    "夏",
-    "秋",
-    "冬",
-    "传统",
-    "体验",
-    "表演",
-    "美食",
-    "烟花",
-    "灯笼",
-    "樱花",
-    "夜景",
-    "首尔",
-    "釜山",
-    "济州岛",
-    "江原道",
-  ],
-  fra: [
-    "Printemps",
-    "Été",
-    "Automne",
-    "Hiver",
-    "Tradition",
-    "Expérience",
-    "Spectacle",
-    "Gastronomie",
-    "Feux d'artifice",
-    "Lanternes",
-    "Cerisiers",
-    "Paysage nocturne",
-    "Séoul",
-    "Busan",
-    "Jeju",
-    "Gangwon",
-  ],
-  spa: [
-    "Primavera",
-    "Verano",
-    "Otoño",
-    "Invierno",
-    "Tradición",
-    "Experiencia",
-    "Espectáculo",
-    "Gastronomía",
-    "Fuegos artificiales",
-    "Faroles",
-    "Cerezos",
-    "Paisaje nocturno",
-    "Seúl",
-    "Busan",
-    "Jeju",
-    "Gangwon",
-  ],
-  rus: [
-    "Весна",
-    "Лето",
-    "Осень",
-    "Зима",
-    "Традиция",
-    "Опыт",
-    "Шоу",
-    "Еда",
-    "Фейерверк",
-    "Фонарь",
-    "Сакура",
-    "Ночной пейзаж",
-    "Сеул",
-    "Пусан",
-    "Чеджу",
-    "Канвондо",
-  ],
-};
-
 function normalizeFilterTerm(value: string) {
   return value.trim().toLowerCase();
 }
@@ -169,7 +35,7 @@ export function isFestivalFilterKeyword(
   lang: FestivalSearchLanguage,
 ) {
   const normalizedValue = normalizeFilterTerm(value);
-  return FESTIVAL_FILTER_TERMS[lang].some(
+  return Object.values(FESTIVAL_FILTER_KEYWORDS[lang]).some(
     (term) => normalizeFilterTerm(term) === normalizedValue,
   );
 }

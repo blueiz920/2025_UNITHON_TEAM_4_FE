@@ -129,24 +129,6 @@
     "invalid": "Поиск невозможен только с корейскими согласными/гласными или пробелами. Пожалуйста, введите более подробную информацию."
   },
   "festivalFilter": {
-    "keywords": {
-      "spring": "Весна",
-      "summer": "Лето",
-      "autumn": "Осень",
-      "winter": "Зима",
-      "traditional": "Традиция",
-      "experience": "Опыт",
-      "performance": "Шоу",
-      "food": "Еда",
-      "fireworks": "Фейерверк",
-      "lantern": "Фонарь",
-      "cherryBlossom": "Сакура",
-      "nightView": "Ночной пейзаж",
-      "seoul": "Сеул",
-      "busan": "Пусан",
-      "jeju": "Чеджу",
-      "gangwon": "Канвондо"
-    },
     "filter": "Фильтр",
     "filterApplied": "Фильтр применён",
     "reset": "Сбросить",

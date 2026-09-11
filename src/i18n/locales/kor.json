@@ -195,24 +195,6 @@
     "invalid": "한글 자음/모음, 공백만으로는 검색이 불가합니다. 더 구체적으로 입력해 주세요."
   },
   "festivalFilter": {
-    "keywords": {
-      "spring": "봄",
-      "summer": "여름",
-      "autumn": "가을",
-      "winter": "겨울",
-      "traditional": "전통",
-      "experience": "체험",
-      "performance": "공연",
-      "food": "음식",
-      "fireworks": "불꽃",
-      "lantern": "등불",
-      "cherryBlossom": "벚꽃",
-      "nightView": "야경",
-      "seoul": "서울",
-      "busan": "부산",
-      "jeju": "제주도",
-      "gangwon": "강원도"
-    },
     "filter": "필터",
     "filterApplied": "필터 적용됨",
     "reset": "초기화",

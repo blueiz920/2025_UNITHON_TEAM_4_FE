@@ -165,24 +165,6 @@
     "invalid": "ハングル子音・母音、空白のみでは検索できません。より具体的に入力してください。"
   },
   "festivalFilter": {
-    "keywords": {
-      "spring": "春",
-      "summer": "夏",
-      "autumn": "秋",
-      "winter": "冬",
-      "traditional": "伝統",
-      "experience": "体験",
-      "performance": "公演",
-      "food": "グルメ",
-      "fireworks": "花火",
-      "lantern": "提灯",
-      "cherryBlossom": "桜",
-      "nightView": "夜景",
-      "seoul": "ソウル",
-      "busan": "釜山",
-      "jeju": "済州島",
-      "gangwon": "江原道"
-    },
     "filter": "フィルター",
     "filterApplied": "フィルター適用済み",
     "reset": "リセット",
