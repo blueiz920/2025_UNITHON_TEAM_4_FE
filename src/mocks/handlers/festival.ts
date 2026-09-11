@@ -76,6 +76,67 @@ function createFestivalListResponse(request: Request) {
   return HttpResponse.json(response);
 }
 
+function normalizeKeyword(value: string | null) {
+  return value?.trim().toLowerCase() ?? "";
+}
+
+function getFestivalSearchParams(request: Request) {
+  const requestUrl = new URL(request.url);
+
+  return {
+    keyword: normalizeKeyword(requestUrl.searchParams.get("keyword")),
+    pageNo: parsePositiveInteger(requestUrl.searchParams.get("pageNo"), DEFAULT_PAGE_NO),
+    numOfRows: parsePositiveInteger(
+      requestUrl.searchParams.get("numOfRows"),
+      DEFAULT_NUM_OF_ROWS,
+    ),
+  };
+}
+
+function createFestivalSearchResponse(request: Request) {
+  const { keyword, pageNo, numOfRows } = getFestivalSearchParams(request);
+  const filteredFestivals = keyword
+    ? mockFestivals.filter((festival) => {
+        const searchableText = [
+          festival.title,
+          festival.overview,
+          festival.addr1,
+          festival.addr2,
+        ]
+          .filter((value): value is string => Boolean(value))
+          .join(" ")
+          .toLowerCase();
+
+        return searchableText.includes(keyword);
+      })
+    : mockFestivals;
+  const startIndex = (pageNo - 1) * numOfRows;
+  const item = filteredFestivals.slice(startIndex, startIndex + numOfRows);
+
+  const response: FestivalListResponse = {
+    status: 200,
+    message: "OK",
+    data: {
+      response: {
+        header: {
+          resultCode: "0000",
+          resultMsg: "OK",
+        },
+        body: {
+          items: {
+            item,
+          },
+          numOfRows,
+          pageNo,
+          totalCount: filteredFestivals.length,
+        },
+      },
+    },
+  };
+
+  return HttpResponse.json(response);
+}
+
 function isFestivalListProxyRequest(request: Request) {
   const requestUrl = new URL(request.url);
   const targetUrl = requestUrl.searchParams.get("url");
@@ -89,13 +150,31 @@ function isFestivalListProxyRequest(request: Request) {
   }
 }
 
+function isFestivalSearchProxyRequest(request: Request) {
+  const requestUrl = new URL(request.url);
+  const targetUrl = requestUrl.searchParams.get("url");
+
+  if (!targetUrl) return false;
+
+  try {
+    return new URL(targetUrl, requestUrl.origin).pathname.endsWith("/festivals/search");
+  } catch {
+    return targetUrl.includes("/festivals/search");
+  }
+}
+
 export const festivalHandlers = [
   http.get("*/festivals/list", ({ request }) => createFestivalListResponse(request)),
+  http.get("*/festivals/search", ({ request }) => createFestivalSearchResponse(request)),
   http.get("*/api/proxy", ({ request }) => {
-    if (!isFestivalListProxyRequest(request)) {
-      return passthrough();
+    if (isFestivalListProxyRequest(request)) {
+      return createFestivalListResponse(request);
     }
 
-    return createFestivalListResponse(request);
+    if (isFestivalSearchProxyRequest(request)) {
+      return createFestivalSearchResponse(request);
+    }
+
+    return passthrough();
   }),
 ];
