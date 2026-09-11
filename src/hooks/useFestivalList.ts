@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useLangStore } from "../libraries/stores/langStore";
 import {
   fetchFestivalInfo,
@@ -114,16 +114,11 @@ export function useFestivalSearchByKeywords(
   ).sort();
   const normalizedKeywordKey = normalizedKeywords.join("\u0000");
   const paginationKey = [normalizedKeywordKey, mode, lang].join("\u0001");
-  const [pagination, setPagination] = useState({
-    key: paginationKey,
-    page: 1,
-  });
+  const [visiblePage, setVisiblePage] = useState(1);
 
-  if (pagination.key !== paginationKey) {
-    setPagination({ key: paginationKey, page: 1 });
-  }
-
-  const visiblePage = pagination.key === paginationKey ? pagination.page : 1;
+  useLayoutEffect(() => {
+    setVisiblePage(1);
+  }, [paginationKey]);
 
   const query = useQuery<FestivalSearchPage>({
     queryKey: ["festivalSearchByKeywords", normalizedKeywords, mode, lang],
@@ -148,13 +143,7 @@ export function useFestivalSearchByKeywords(
 
   const fetchNextPage = () => {
     if (hasNextPage) {
-      setPagination((previousPagination) => ({
-        key: paginationKey,
-        page:
-          previousPagination.key === paginationKey
-            ? previousPagination.page + 1
-            : 2,
-      }));
+      setVisiblePage((page) => page + 1);
     }
   };
 
