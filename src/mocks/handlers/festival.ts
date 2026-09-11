@@ -108,9 +108,18 @@ function getFestivalSearchableText(
   festival: (typeof mockFestivals)[number],
   lang: FestivalSearchLanguage,
 ) {
-  const aliases = festivalSearchAliases[festival.contentid]?.[lang]?.aliases ?? [];
+  const searchTerms = festivalSearchAliases[festival.contentid]?.[lang];
+  const aliases = searchTerms?.aliases ?? [];
+  const tags = searchTerms?.tags ?? [];
 
-  return [festival.title, festival.overview, festival.addr1, festival.addr2, ...aliases]
+  return [
+    festival.title,
+    festival.overview,
+    festival.addr1,
+    festival.addr2,
+    ...aliases,
+    ...tags,
+  ]
     .filter((value): value is string => Boolean(value))
     .join(" ")
     .toLowerCase();
