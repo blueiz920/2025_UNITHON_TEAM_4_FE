@@ -94,7 +94,7 @@ export function FestivalGrid({ festivals, onUpdateDetails }: FestivalGridProps) 
   // 좋아요 토글 핸들러
   const handleToggleLike = async (festival: Festival) => {
     try {
-      const result = await toggleFestivalLike({
+      await toggleFestivalLike({
         contentId: festival.contentid,
         title: festival.name,
         imageUrl: festival.image,
@@ -104,7 +104,6 @@ export function FestivalGrid({ festivals, onUpdateDetails }: FestivalGridProps) 
         ...prev,
         [festival.contentid]: !prev[festival.contentid],
       }));
-      alert(result.message || (!likedMap[String(festival.contentid)] ? "좋아요 추가" : "좋아요 취소"));
     } catch (e) {
       console.error(e);
       alert("좋아요 처리 오류가 발생했습니다.");
