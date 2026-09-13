@@ -34,9 +34,11 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+  const isDemoMode = import.meta.env.VITE_API_MODE === "mock";
   const { lang, setLang } = useLangStore();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const showMyPage = isDemoMode || isLoggedIn;
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
   }, []);
@@ -133,30 +135,42 @@ export default function Navbar() {
                           </div>
                         )}
                       </div>
-                      <Link
-                        to={routePath.MyPage}
-                        className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:bg-orange-50 hover:text-[#ff651b] rounded-md transition-colors"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <UserIcon className="mr-2 h-4 w-4" />
-                        {t("navbar.mypage")}
-                      </Link>
-                      <div className="space-y-2">
+                      {showMyPage && (
                         <Link
-                          to={routePath.Login}
-                          className="block w-full border border-[#ff651b] text-[#ff651b] rounded-md px-4 py-2 text-center hover:bg-[#ff651b] hover:text-white transition-colors"
+                          to={routePath.MyPage}
+                          className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:bg-orange-50 hover:text-[#ff651b] rounded-md transition-colors"
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
-                          {t("navbar.login")}
+                          <UserIcon className="mr-2 h-4 w-4" />
+                          {t("navbar.mypage")}
                         </Link>
-                        <Link
-                          to={routePath.Signup}
-                          className="block w-full bg-[#ff651b] hover:bg-[#e55a18] text-white rounded-md px-4 py-2 text-center transition-colors"
-                          onClick={() => setIsMobileMenuOpen(false)}
+                      )}
+                      {!isDemoMode && isLoggedIn && (
+                        <button
+                          onClick={handleLogout}
+                          className="w-full bg-[#ff651b] hover:bg-[#e55a18] text-white rounded-md px-4 py-2 shadow-md hover:shadow-lg transition-all duration-200"
                         >
-                          {t("navbar.signup")}
-                        </Link>
-                      </div>
+                          {t("navbar.logout")}
+                        </button>
+                      )}
+                      {!isDemoMode && !isLoggedIn && (
+                        <div className="space-y-2">
+                          <Link
+                            to={routePath.Login}
+                            className="block w-full border border-[#ff651b] text-[#ff651b] rounded-md px-4 py-2 text-center hover:bg-[#ff651b] hover:text-white transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {t("navbar.login")}
+                          </Link>
+                          <Link
+                            to={routePath.Signup}
+                            className="block w-full bg-[#ff651b] hover:bg-[#e55a18] text-white rounded-md px-4 py-2 text-center transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {t("navbar.signup")}
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -191,7 +205,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            {isLoggedIn ? (
+            {showMyPage ? (
           <>
             {/* 마이페이지 */}
             <Link
@@ -202,12 +216,14 @@ export default function Navbar() {
               {t("navbar.mypage")}
             </Link>
             {/* 로그아웃 */}
-            <button
-              onClick={handleLogout}
-              className="bg-[#ff651b] hover:bg-[#e55a18] text-white rounded-md px-4 py-2 shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              {t("navbar.logout")}
-            </button>
+            {!isDemoMode && (
+              <button
+                onClick={handleLogout}
+                className="bg-[#ff651b] hover:bg-[#e55a18] text-white rounded-md px-4 py-2 shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                {t("navbar.logout")}
+              </button>
+            )}
           </>
         ) : (
           <>
