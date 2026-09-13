@@ -7,6 +7,7 @@ import { Badge } from "../../../components/ui/Badge";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { toggleFestivalLike, getLikedFestivals } from "../../../apis/festival";
+import type { LikedFestival } from "../../../types/festival";
 
 // 타입 선언
 export type Festival = {
@@ -79,17 +80,11 @@ export function FestivalGrid({ festivals, onUpdateDetails }: FestivalGridProps) 
   const [likedMap, setLikedMap] = useState<{ [contentid: string]: boolean }>({});
   const { i18n } = useTranslation();
   const lang = i18n.language;
-  interface LikedFestival {
-    contentId: string;
-    title: string;
-    imageUrl: string;
-    address: string;
-  }
   // 내 좋아요 목록 fetch
   useEffect(() => {
     getLikedFestivals().then((res) => {
       const map: { [contentid: string]: boolean } = {};
-      (res ?? []).forEach((f: LikedFestival) => {
+      res.forEach((f: LikedFestival) => {
         map[String(f.contentId)] = true;
       });
       setLikedMap(map);
@@ -99,7 +94,7 @@ export function FestivalGrid({ festivals, onUpdateDetails }: FestivalGridProps) 
   // 좋아요 토글 핸들러
   const handleToggleLike = async (festival: Festival) => {
     try {
-      const result = await toggleFestivalLike({
+      await toggleFestivalLike({
         contentId: festival.contentid,
         title: festival.name,
         imageUrl: festival.image,
@@ -109,7 +104,6 @@ export function FestivalGrid({ festivals, onUpdateDetails }: FestivalGridProps) 
         ...prev,
         [festival.contentid]: !prev[festival.contentid],
       }));
-      alert(result.message || (!likedMap[String(festival.contentid)] ? "좋아요 추가" : "좋아요 취소"));
     } catch (e) {
       console.error(e);
       alert("좋아요 처리 오류가 발생했습니다.");

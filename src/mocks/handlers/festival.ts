@@ -7,6 +7,8 @@ import type {
   FestivalInfoItem,
   FestivalInfoResponse,
   FestivalListResponse,
+  FestivalLike,
+  LikedFestival,
   LocationFoodItem,
   LocationFoodResponse,
 } from "../../types/festival";
@@ -22,6 +24,10 @@ import {
   isFestivalSearchLanguage,
 } from "../data/festivalSearchAliases";
 import type { FestivalSearchLanguage } from "../data/festivalSearchAliases";
+import {
+  readFestivalLikes,
+  toggleStoredFestivalLike,
+} from "../storage/festivalLikes";
 
 const DEFAULT_PAGE_NO = 1;
 const DEFAULT_NUM_OF_ROWS = 8;
@@ -473,13 +479,112 @@ function isFestivalProxyRequest(request: Request, endpoint: string) {
   return getProxyTargetPath(request)?.endsWith(endpoint) ?? false;
 }
 
+function getFestivalLikeRequestPath(request: Request) {
+  return getProxyTargetPath(request) ?? new URL(request.url).pathname;
+}
+
+function getFestivalLikeContentId(request: Request) {
+  const path = getFestivalLikeRequestPath(request);
+  const match = path.match(/\/festivals\/([^/]+)\/like$/);
+
+  if (!match?.[1]) return undefined;
+
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return undefined;
+  }
+}
+
+function isFestivalLikePath(path?: string) {
+  return /\/festivals\/[^/]+\/like$/.test(path ?? "");
+}
+
+function isFestivalProxyLikeRequest(request: Request) {
+  return isFestivalLikePath(getProxyTargetPath(request));
+}
+
+function createFestivalLikesResponse() {
+  const item: LikedFestival[] = readFestivalLikes().map((like) => {
+    const festival = findFestivalByContentId(like.contentId);
+
+    return festival
+      ? { ...like, contentTypeId: festival.contenttypeid }
+      : like;
+  });
+
+  return HttpResponse.json(item);
+}
+
+async function readFestivalLikePayload(
+  request: Request,
+  contentId?: string,
+): Promise<FestivalLike | null> {
+  if (!contentId) return null;
+
+  let parsed: unknown;
+  try {
+    parsed = await request.json();
+  } catch {
+    return null;
+  }
+
+  if (!parsed || typeof parsed !== "object") return null;
+
+  const body = parsed as Record<string, unknown>;
+  if (
+    typeof body.contentId !== "string" ||
+    typeof body.title !== "string" ||
+    typeof body.imageUrl !== "string" ||
+    typeof body.address !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    // The REST path is the identity source; the body is still contract-validated.
+    contentId,
+    title: body.title,
+    imageUrl: body.imageUrl,
+    address: body.address,
+  };
+}
+
+async function createFestivalLikeResponse(request: Request) {
+  const contentId = getFestivalLikeContentId(request);
+  const like = await readFestivalLikePayload(request, contentId);
+
+  if (!like) {
+    return HttpResponse.json(
+      { message: "좋아요 요청이 올바르지 않습니다." },
+      { status: 400 },
+    );
+  }
+
+  const result = toggleStoredFestivalLike(like);
+  if (!result.success) {
+    return HttpResponse.json(
+      { message: "좋아요 저장에 실패했습니다." },
+      { status: 500 },
+    );
+  }
+
+  return HttpResponse.json({
+    message: result.liked ? "좋아요 추가됨" : "좋아요 취소됨",
+  });
+}
+
 export const festivalHandlers = [
   http.get("*/festivals/list", ({ request }) => createFestivalListResponse(request)),
   http.get("*/festivals/search", ({ request }) => createFestivalSearchResponse(request)),
+  http.get("*/festivals/likes", () => createFestivalLikesResponse()),
   http.get("*/festivals/info", ({ request }) => createFestivalInfoResponse(request)),
   http.get("*/festivals/detailIntro", ({ request }) => createFestivalDetailIntroResponse(request)),
   http.get("*/festivals/detailInfo", ({ request }) => createFestivalDetailInfoResponse(request)),
   http.get("*/festivals/locationFood", ({ request }) => createLocationFoodResponse(request)),
+  http.post("*/festivals/:contentId/like", ({ request }) =>
+    createFestivalLikeResponse(request),
+  ),
   http.get("*/api/proxy", ({ request }) => {
     if (isFestivalProxyRequest(request, "/festivals/list")) {
       return createFestivalListResponse(request);
@@ -487,6 +592,10 @@ export const festivalHandlers = [
 
     if (isFestivalProxyRequest(request, "/festivals/search")) {
       return createFestivalSearchResponse(request);
+    }
+
+    if (isFestivalProxyRequest(request, "/festivals/likes")) {
+      return createFestivalLikesResponse();
     }
 
     if (isFestivalProxyRequest(request, "/festivals/info")) {
@@ -503,6 +612,13 @@ export const festivalHandlers = [
 
     if (isFestivalProxyRequest(request, "/festivals/locationFood")) {
       return createLocationFoodResponse(request);
+    }
+
+    return passthrough();
+  }),
+  http.post("*/api/proxy", ({ request }) => {
+    if (isFestivalProxyLikeRequest(request)) {
+      return createFestivalLikeResponse(request);
     }
 
     return passthrough();

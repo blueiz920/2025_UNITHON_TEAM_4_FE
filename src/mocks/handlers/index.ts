@@ -1,3 +1,4 @@
 import { festivalHandlers } from "./festival";
+import { userHandlers } from "./user";
 
-export const handlers = [...festivalHandlers];
+export const handlers = [...userHandlers, ...festivalHandlers];

@@ -40,6 +40,28 @@ export interface FestivalListResponse {
     };
   };
 }
+
+export interface FestivalLike {
+  contentId: string;
+  title: string;
+  imageUrl: string;
+  /**
+   * Legacy backend field. Stores the language code used when the festival was liked.
+   */
+  address: string;
+}
+
+export interface LikedFestival extends FestivalLike {
+  /**
+   * Demo GET response may enrich this from the festival fixture.
+   */
+  contentTypeId?: string;
+}
+
+export interface FestivalLikeResponse {
+  message: string;
+}
+
 // Overview(소개/info)용
 export interface FestivalInfoItem {
   contentid: string;
