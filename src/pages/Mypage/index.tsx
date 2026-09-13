@@ -29,7 +29,9 @@ interface LikedFestival {
   contentId: string;
   title: string;
   imageUrl?: string;
+  // Legacy API field: saved language code, not a physical address.
   address?: string;
+  contentTypeId?: string;
   // Add other properties as needed
 }
 export default function MyPage() {
@@ -317,7 +319,7 @@ export default function MyPage() {
                         {likedFestivals.map((festival: LikedFestival) => {
                           const lang = i18n.language;
                           const bookmarkedLang = festival.address;
-                          const code = lang === "kor" ? 15 : 85;
+                          const code = festival.contentTypeId ?? (lang === "kor" ? "15" : "85");
                           return (
                             <div
                               key={festival.contentId}

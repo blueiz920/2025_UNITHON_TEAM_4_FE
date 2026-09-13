@@ -83,6 +83,7 @@ export function FestivalGrid({ festivals, onUpdateDetails }: FestivalGridProps) 
     contentId: string;
     title: string;
     imageUrl: string;
+    // Legacy API field: stores the language used when the like was saved.
     address: string;
   }
   // 내 좋아요 목록 fetch
