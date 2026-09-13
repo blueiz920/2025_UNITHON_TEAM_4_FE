@@ -1,12 +1,6 @@
-export const FESTIVAL_LIKES_STORAGE_KEY = "k-festival:demo:liked-festivals:v1";
+import type { FestivalLike } from "../../types/festival";
 
-export type FestivalLike = {
-  contentId: string;
-  title: string;
-  imageUrl: string;
-  // Legacy API field: stores the language used when the like was saved.
-  address: string;
-};
+export const FESTIVAL_LIKES_STORAGE_KEY = "k-festival:demo:liked-festivals:v1";
 
 function isFestivalLike(value: unknown): value is FestivalLike {
   if (!value || typeof value !== "object") return false;

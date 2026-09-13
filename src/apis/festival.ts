@@ -4,7 +4,10 @@ import type {
   FestivalInfoResponse,
   FestivalListResponse,
   FestivalDetailInfoResponse,
-  LocationFoodResponse
+  LocationFoodResponse,
+  FestivalLike,
+  FestivalLikeResponse,
+  LikedFestival,
 } from "../types/festival";
 
 // 파라미터 타입 정의
@@ -144,12 +147,7 @@ export async function toggleFestivalLike({
   title,
   imageUrl,
   address,
-}: {
-  contentId: string;
-  title: string;
-  imageUrl: string;
-  address: string;
-}) {
+}: FestivalLike): Promise<FestivalLikeResponse> {
   // POST /api/v1/festivals/{contentId}/like
   const res = await client.post(
     getApiUrl(`/festivals/${contentId}/like`),
@@ -159,7 +157,7 @@ export async function toggleFestivalLike({
 }
 
 /** 내가 좋아요한 축제 목록 조회 */
-export async function getLikedFestivals() {
+export async function getLikedFestivals(): Promise<LikedFestival[]> {
   // GET /api/v1/festivals/likes
   const res = await client.get(getApiUrl("/festivals/likes"));
   return res.data; // [{ contentId, title, imageUrl, address }, ...]

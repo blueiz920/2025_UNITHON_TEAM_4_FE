@@ -7,6 +7,8 @@ import type {
   FestivalInfoItem,
   FestivalInfoResponse,
   FestivalListResponse,
+  FestivalLike,
+  LikedFestival,
   LocationFoodItem,
   LocationFoodResponse,
 } from "../../types/festival";
@@ -26,7 +28,6 @@ import {
   readFestivalLikes,
   toggleStoredFestivalLike,
 } from "../storage/festivalLikes";
-import type { FestivalLike } from "../storage/festivalLikes";
 
 const DEFAULT_PAGE_NO = 1;
 const DEFAULT_NUM_OF_ROWS = 8;
@@ -504,7 +505,7 @@ function isFestivalProxyLikeRequest(request: Request) {
 }
 
 function createFestivalLikesResponse() {
-  const item = readFestivalLikes().map((like) => {
+  const item: LikedFestival[] = readFestivalLikes().map((like) => {
     const festival = findFestivalByContentId(like.contentId);
 
     return festival

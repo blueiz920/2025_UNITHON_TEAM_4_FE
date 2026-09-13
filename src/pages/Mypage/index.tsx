@@ -6,6 +6,7 @@ import { fetchUserProfile } from "../../apis/users";
 import { deletePost } from "../../apis/post";
 import { getLikedFestivals } from "../../apis/festival"; // ✨ 추가
 import { useTranslation } from "react-i18next";
+import type { LikedFestival } from "../../types/festival";
 
 const NAVBAR_HEIGHT = 90;
 
@@ -25,15 +26,6 @@ interface UserProfile {
   posts: Post[];
 }
 
-interface LikedFestival {
-  contentId: string;
-  title: string;
-  imageUrl?: string;
-  // Legacy API field: saved language code, not a physical address.
-  address?: string;
-  contentTypeId?: string;
-  // Add other properties as needed
-}
 export default function MyPage() {
   const { t, i18n } = useTranslation();
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -88,7 +80,7 @@ export default function MyPage() {
   setFestivalsLoading(true);
   getLikedFestivals()
     .then((res) => {
-      setLikedFestivals(res ?? []);
+      setLikedFestivals(res);
     })
     .catch(() => setLikedFestivals([]))
     .finally(() => setFestivalsLoading(false));
@@ -316,7 +308,7 @@ export default function MyPage() {
                       <div className="text-center py-20 text-gray-400">{t("mypage.noFestivals") || "좋아요한 축제가 없습니다."}</div>
                     ) : (
                       <div className="grid grid-cols-3 gap-4">
-                        {likedFestivals.map((festival: LikedFestival) => {
+                        {likedFestivals.map((festival) => {
                           const lang = i18n.language;
                           const bookmarkedLang = festival.address;
                           const code = festival.contentTypeId ?? (lang === "kor" ? "15" : "85");

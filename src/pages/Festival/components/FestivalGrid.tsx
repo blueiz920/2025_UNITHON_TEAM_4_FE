@@ -7,6 +7,7 @@ import { Badge } from "../../../components/ui/Badge";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { toggleFestivalLike, getLikedFestivals } from "../../../apis/festival";
+import type { LikedFestival } from "../../../types/festival";
 
 // 타입 선언
 export type Festival = {
@@ -79,18 +80,11 @@ export function FestivalGrid({ festivals, onUpdateDetails }: FestivalGridProps) 
   const [likedMap, setLikedMap] = useState<{ [contentid: string]: boolean }>({});
   const { i18n } = useTranslation();
   const lang = i18n.language;
-  interface LikedFestival {
-    contentId: string;
-    title: string;
-    imageUrl: string;
-    // Legacy API field: stores the language used when the like was saved.
-    address: string;
-  }
   // 내 좋아요 목록 fetch
   useEffect(() => {
     getLikedFestivals().then((res) => {
       const map: { [contentid: string]: boolean } = {};
-      (res ?? []).forEach((f: LikedFestival) => {
+      res.forEach((f: LikedFestival) => {
         map[String(f.contentId)] = true;
       });
       setLikedMap(map);
