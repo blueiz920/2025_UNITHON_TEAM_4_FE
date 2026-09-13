@@ -36,31 +36,40 @@ export function readFestivalLikes(): FestivalLike[] {
   }
 }
 
-export function writeFestivalLikes(likes: FestivalLike[]) {
-  if (typeof window === "undefined") return;
+export function writeFestivalLikes(likes: FestivalLike[]): boolean {
+  if (typeof window === "undefined") return false;
 
   try {
     window.localStorage.setItem(
       FESTIVAL_LIKES_STORAGE_KEY,
       JSON.stringify(likes),
     );
+    return true;
   } catch {
     // Demo storage failures should not crash the application.
+    return false;
   }
 }
 
-export function toggleStoredFestivalLike(like: FestivalLike) {
+type FestivalLikeToggleResult =
+  | { success: true; liked: boolean }
+  | { success: false };
+
+export function toggleStoredFestivalLike(
+  like: FestivalLike,
+): FestivalLikeToggleResult {
   const likes = readFestivalLikes();
   const existingIndex = likes.findIndex(
     (savedLike) => savedLike.contentId === like.contentId,
   );
+  const nextLikes =
+    existingIndex >= 0
+      ? likes.filter((savedLike) => savedLike.contentId !== like.contentId)
+      : [...likes, like];
 
-  if (existingIndex >= 0) {
-    likes.splice(existingIndex, 1);
-    writeFestivalLikes(likes);
-    return { liked: false };
+  if (!writeFestivalLikes(nextLikes)) {
+    return { success: false };
   }
 
-  writeFestivalLikes([...likes, like]);
-  return { liked: true };
+  return { success: true, liked: existingIndex < 0 };
 }

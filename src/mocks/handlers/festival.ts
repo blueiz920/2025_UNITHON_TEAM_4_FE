@@ -562,6 +562,13 @@ async function createFestivalLikeResponse(request: Request) {
   }
 
   const result = toggleStoredFestivalLike(like);
+  if (!result.success) {
+    return HttpResponse.json(
+      { message: "좋아요 저장에 실패했습니다." },
+      { status: 500 },
+    );
+  }
+
   return HttpResponse.json({
     message: result.liked ? "좋아요 추가됨" : "좋아요 취소됨",
   });
