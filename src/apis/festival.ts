@@ -71,7 +71,7 @@ export async function fetchFestivalInfo(contentId: string, lang: string) {
       contentId,
     },
   });
-  return res.data.data.response.body.items.item[0];
+  return res.data.data.response.body.items.item[0] ?? null;
 }
 
 // 2. 개별 축제 기간(시작일/종료일) fetch
@@ -83,7 +83,7 @@ export async function fetchFestivalPeriod(contentId: string, contentTypeId: stri
       contentTypeId,
     },
   });
-  return res.data.data.response.body.items.item[0];
+  return res.data.data.response.body.items.item[0] ?? null;
 }
 
 // 행사내용(detailInfo) fetch
