@@ -1,4 +1,11 @@
 import type { FestivalListItem } from "../../types/festival";
+import chn from "../../i18n/locales/chn.json";
+import eng from "../../i18n/locales/eng.json";
+import fra from "../../i18n/locales/fra.json";
+import jpn from "../../i18n/locales/jpn.json";
+import kor from "../../i18n/locales/kor.json";
+import rus from "../../i18n/locales/rus.json";
+import spa from "../../i18n/locales/spa.json";
 import type { FestivalSearchLanguage } from "./festivalSearchAliases";
 
 export type FestivalFoodMetadata = {
@@ -29,13 +36,13 @@ const festivalDetailSectionLabels: Record<
   FestivalSearchLanguage,
   FestivalDetailSectionLabels
 > = {
-  kor: { intro: "행사소개", detail: "행사내용" },
-  eng: { intro: "Introduction", detail: "Details" },
-  jpn: { intro: "イベント紹介", detail: "イベント内容" },
-  chn: { intro: "活动介绍", detail: "活动内容" },
-  fra: { intro: "Présentation de l'événement", detail: "Contenu de l'événement" },
-  spa: { intro: "Introducción al evento", detail: "Contenido del evento" },
-  rus: { intro: "Введение", detail: "Описание мероприятия" },
+  kor: { intro: kor.festivalDetail.introTitle, detail: kor.festivalDetail.detailTitle },
+  eng: { intro: eng.festivalDetail.introTitle, detail: eng.festivalDetail.detailTitle },
+  jpn: { intro: jpn.festivalDetail.introTitle, detail: jpn.festivalDetail.detailTitle },
+  chn: { intro: chn.festivalDetail.introTitle, detail: chn.festivalDetail.detailTitle },
+  fra: { intro: fra.festivalDetail.introTitle, detail: fra.festivalDetail.detailTitle },
+  spa: { intro: spa.festivalDetail.introTitle, detail: spa.festivalDetail.detailTitle },
+  rus: { intro: rus.festivalDetail.introTitle, detail: rus.festivalDetail.detailTitle },
 };
 
 export function getFestivalDetailSectionLabels(
@@ -135,7 +142,7 @@ function createFallbackMetadata(festival: FestivalListItem): FestivalDetailMetad
   const overview = festival.overview || `${festival.title}에서 지역 문화를 즐길 수 있는 축제입니다.`;
 
   return {
-    sponsor1: "마크클라우드 Demo 운영팀",
+    sponsor1: "K-Festival Demo 운영팀",
     sponsor1tel: phone,
     eventplace: venue,
     program: `${festival.title} 전시, 공연, 체험 프로그램`,

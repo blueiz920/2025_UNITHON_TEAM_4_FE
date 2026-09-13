@@ -226,6 +226,17 @@ function findFestivalByContentId(contentId?: string) {
   return mockFestivals.find((festival) => festival.contentid === contentId);
 }
 
+function findFestivalByDetailParams(
+  contentId?: string,
+  contentTypeId?: string,
+) {
+  return mockFestivals.find(
+    (festival) =>
+      festival.contentid === contentId &&
+      festival.contenttypeid === contentTypeId,
+  );
+}
+
 function createFestivalInfoItem(festival: (typeof mockFestivals)[number]): FestivalInfoItem {
   return {
     contentid: festival.contentid,
@@ -274,8 +285,8 @@ function createFestivalInfoResponse(request: Request) {
 }
 
 function createFestivalDetailIntroResponse(request: Request) {
-  const { contentId } = getFestivalDetailParams(request);
-  const festival = findFestivalByContentId(contentId);
+  const { contentId, contentTypeId } = getFestivalDetailParams(request);
+  const festival = findFestivalByDetailParams(contentId, contentTypeId);
   const metadata = festival ? getFestivalDetailMetadata(festival) : undefined;
   const item: FestivalDetailIntroItem[] = festival && metadata
     ? [
@@ -287,7 +298,7 @@ function createFestivalDetailIntroResponse(request: Request) {
           eventenddate: festival.eventenddate,
           playtime: "10:00 ~ 20:00",
           eventplace: metadata.eventplace,
-          eventhomepage: "https://demo.markcloud.example/festivals",
+          eventhomepage: "https://festival-demo.example",
           agelimit: "전 연령",
           bookingplace: "현장 접수",
           placeinfo: `${festival.addr1} ${festival.addr2 ?? ""}`.trim(),
@@ -325,8 +336,8 @@ function createFestivalDetailIntroResponse(request: Request) {
 }
 
 function createFestivalDetailInfoResponse(request: Request) {
-  const { contentId, lang } = getFestivalDetailParams(request);
-  const festival = findFestivalByContentId(contentId);
+  const { contentId, contentTypeId, lang } = getFestivalDetailParams(request);
+  const festival = findFestivalByDetailParams(contentId, contentTypeId);
   const metadata = festival ? getFestivalDetailMetadata(festival) : undefined;
   const sectionLabels = getFestivalDetailSectionLabels(lang);
   const item: FestivalDetailInfoItem[] = festival && metadata
