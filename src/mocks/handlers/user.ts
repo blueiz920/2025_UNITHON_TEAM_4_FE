@@ -1,18 +1,7 @@
 import { http, HttpResponse } from "msw";
 import type { UserProfileResponse } from "../../apis/users";
-
-const demoUserProfileResponse: UserProfileResponse = {
-  status: 200,
-  message: "OK",
-  data: {
-    name: "Demo User",
-    profileImageUrl: "",
-    email: "demo@k-festival.local",
-    createdAt: "2026-01-01T00:00:00",
-    postCount: 0,
-    posts: [],
-  },
-};
+import { DEMO_USER_ID } from "../data/communityPosts";
+import { readCommunityPosts } from "../storage/communityPosts";
 
 function getProxyTargetPath(request: Request) {
   const requestUrl = new URL(request.url);
@@ -32,7 +21,29 @@ function isUserProxyRequest(request: Request) {
 }
 
 function createDemoUserProfileResponse() {
-  return HttpResponse.json(demoUserProfileResponse);
+  const posts = readCommunityPosts()
+    .filter((post) => post.writer.id === DEMO_USER_ID)
+    .sort((a, b) => b.postId - a.postId)
+    .map((post) => ({
+      postId: post.postId,
+      thumbnailUrl: post.thumbnailUrl,
+      title: post.title,
+      updatedAt: post.updatedAt,
+    }));
+  const response: UserProfileResponse = {
+    status: 200,
+    message: "OK",
+    data: {
+      name: "Demo User",
+      profileImageUrl: "",
+      email: "demo@k-festival.local",
+      createdAt: "2026-01-01T00:00:00",
+      postCount: posts.length,
+      posts,
+    },
+  };
+
+  return HttpResponse.json(response);
 }
 
 export const userHandlers = [
