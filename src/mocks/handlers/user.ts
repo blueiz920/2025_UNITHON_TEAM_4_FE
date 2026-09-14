@@ -168,7 +168,7 @@ async function updateUserResponse(request: Request) {
     return createErrorResponse(500, "사용자 정보 저장에 실패했습니다.");
   }
 
-  return createUserResponse(nextProfile, "이름이 변경되었습니다.");
+  return createUserResponse(nextProfile, "이름 변경에 성공했습니다.");
 }
 
 async function updateProfileImageResponse(request: Request) {
@@ -193,7 +193,7 @@ async function updateProfileImageResponse(request: Request) {
 
   return HttpResponse.json({
     status: 200,
-    message: "프로필 이미지가 변경되었습니다.",
+    message: "프로필 이미지 변경에 성공했습니다.",
   });
 }
 

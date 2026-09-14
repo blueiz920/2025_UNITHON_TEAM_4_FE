@@ -3,11 +3,10 @@ import type {
   BaseResponse,
   Comment,
   PostDetail,
+  Writer,
 } from "../../apis/post";
 import type { Post, PostsPaginatedResponse } from "../../apis/posts";
-import {
-  DEMO_USER,
-} from "../data/communityPosts";
+import { DEMO_USER_ID } from "../data/communityPosts";
 import {
   deleteStoredCommunityPost,
   readCommunityLikedPostIds,
@@ -15,11 +14,22 @@ import {
   toggleStoredCommunityPostLike,
   writeCommunityPosts,
 } from "../storage/communityPosts";
+import { readDemoUserProfile } from "../storage/demoUser";
 
 const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 6;
 const MAX_PERSISTED_IMAGE_BYTES = 160_000;
 let imageIdentityCounter = 0;
+
+function getCurrentDemoWriter(): Writer {
+  const profile = readDemoUserProfile();
+
+  return {
+    id: DEMO_USER_ID,
+    name: profile.name,
+    profileImage: profile.profileImageUrl,
+  };
+}
 
 function getRequestTargetUrl(request: Request) {
   const requestUrl = new URL(request.url);
@@ -358,6 +368,7 @@ async function createPostResponse(request: Request) {
   const imageUrls = resolveUploadedImageUrls(imageDataUrls, nextPostId);
   const images = imageUrls.map((imageUrl) => ({ imageUrl }));
   const now = new Date().toISOString();
+  const currentWriter = getCurrentDemoWriter();
   const newPost: PostDetail = {
     postId: nextPostId,
     likes: 0,
@@ -366,7 +377,7 @@ async function createPostResponse(request: Request) {
     thumbnailUrl: images[0].imageUrl,
     images,
     comments: [],
-    writer: DEMO_USER,
+    writer: currentWriter,
     createdAt: now,
     updatedAt: now,
   };
@@ -487,12 +498,13 @@ async function createCommentResponse(request: Request) {
       ),
     ) + 1;
   const now = new Date().toISOString();
+  const currentWriter = getCurrentDemoWriter();
   const comment: Comment = {
     commentId: nextCommentId,
     content,
-    writerId: DEMO_USER.id,
-    writerName: DEMO_USER.name,
-    writerProfileImageUrl: DEMO_USER.profileImage,
+    writerId: currentWriter.id,
+    writerName: currentWriter.name,
+    writerProfileImageUrl: currentWriter.profileImage,
     createdAt: now,
     updatedAt: now,
   };
