@@ -147,6 +147,7 @@ const PasswordChangeModal = ({
 const AccountSetting = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isDemoMode = import.meta.env.VITE_API_MODE === "mock";
   const [user, setUser] = useState<{ name: string; profileImageUrl?: string }>({ name: "" });
   const [profileImage, setProfileImage] = useState<string>("");
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
@@ -283,24 +284,26 @@ const AccountSetting = () => {
         </div>
 
         {/* 비밀번호 */}
-        <div className="mb-8">
-          <label className="block text-gray-600 mb-1">{t("account.password")}</label>
-          <div className="flex items-center">
-            <input
-              type="password"
-              value="**********"
-              disabled
-              className="flex-1 bg-gray-100 border border-gray-200 rounded px-3 py-2 mr-2"
-            />
-            <button
-              className="p-2 rounded text-white flex items-center"
-              style={{ background: "#ff651b" }}
-              onClick={() => setIsPasswordModalOpen(true)}
-            >
-              {t("account.changePassword")}
-            </button>
+        {!isDemoMode && (
+          <div className="mb-8">
+            <label className="block text-gray-600 mb-1">{t("account.password")}</label>
+            <div className="flex items-center">
+              <input
+                type="password"
+                value="**********"
+                disabled
+                className="flex-1 bg-gray-100 border border-gray-200 rounded px-3 py-2 mr-2"
+              />
+              <button
+                className="p-2 rounded text-white flex items-center"
+                style={{ background: "#ff651b" }}
+                onClick={() => setIsPasswordModalOpen(true)}
+              >
+                {t("account.changePassword")}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 상태 메시지 */}
         {statusMessage && (
