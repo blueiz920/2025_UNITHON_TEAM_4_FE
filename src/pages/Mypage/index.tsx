@@ -91,10 +91,15 @@ export default function MyPage() {
   const handleDeletePost = async (postId: number) => {
     try {
       await deletePost(postId);
-      setUserProfile((prev) => ({
-        ...prev,
-        posts: prev.posts.filter((post) => post.postId !== postId),
-      }));
+      setUserProfile((prev) => {
+        const nextPosts = prev.posts.filter((post) => post.postId !== postId);
+
+        return {
+          ...prev,
+          posts: nextPosts,
+          postCount: nextPosts.length,
+        };
+      });
       setIsDeleteDialogOpen(false);
       setSelectedPostId(null);
     } catch (error) {
