@@ -19,6 +19,7 @@ import {
 const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 6;
 const MAX_PERSISTED_IMAGE_BYTES = 160_000;
+let imageIdentityCounter = 0;
 
 function getRequestTargetUrl(request: Request) {
   const requestUrl = new URL(request.url);
@@ -274,12 +275,24 @@ function getImageEntries(formData: FormData) {
     );
 }
 
-function createUploadPlaceholder(postId: number, imageIndex: number) {
+function createUniqueImageIdentity() {
+  const browserCrypto = globalThis.crypto;
+  if (typeof browserCrypto?.randomUUID === "function") {
+    return browserCrypto.randomUUID();
+  }
+
+  imageIdentityCounter += 1;
+  return `${Date.now().toString(36)}-${imageIdentityCounter.toString(36)}-${Math.random()
+    .toString(36)
+    .slice(2)}`;
+}
+
+function createUploadPlaceholder(postId: number) {
   return (
     "https://picsum.photos/seed/community-upload-" +
     postId +
     "-" +
-    imageIndex +
+    createUniqueImageIdentity() +
     "/900/600"
   );
 }
@@ -304,7 +317,8 @@ async function persistImageEntry(entry: File): Promise<string | undefined> {
   }
 
   try {
-    return await convertSmallImageToDataUrl(entry);
+    const dataUrl = await convertSmallImageToDataUrl(entry);
+    return `${dataUrl}#community-image-${createUniqueImageIdentity()}`;
   } catch {
     return undefined;
   }
@@ -318,12 +332,8 @@ async function getUploadedImageDataUrls(formData: FormData) {
 function resolveUploadedImageUrls(
   dataUrls: Array<string | undefined>,
   postId: number,
-  startingIndex = 0,
 ) {
-  return dataUrls.map(
-    (dataUrl, index) =>
-      dataUrl ?? createUploadPlaceholder(postId, startingIndex + index),
-  );
+  return dataUrls.map((dataUrl) => dataUrl ?? createUploadPlaceholder(postId));
 }
 
 async function createPostResponse(request: Request) {
@@ -392,15 +402,15 @@ async function updatePostResponse(request: Request) {
   const retainedImages = post.images.filter(
     (image) => !removedImageUrls.has(image.imageUrl),
   );
-  const newImageUrls = resolveUploadedImageUrls(
-    imageDataUrls,
-    postId,
-    retainedImages.length,
-  );
+  const newImageUrls = resolveUploadedImageUrls(imageDataUrls, postId);
   const images = [
     ...retainedImages,
     ...newImageUrls.map((imageUrl) => ({ imageUrl })),
   ];
+  if (images.length === 0) {
+    return createErrorResponse(400, "이미지를 하나 이상 등록해 주세요.");
+  }
+
   const nextPost: PostDetail = {
     ...post,
     title: data.title ?? post.title,
