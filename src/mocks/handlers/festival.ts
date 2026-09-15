@@ -1,4 +1,4 @@
-import { http, HttpResponse, passthrough } from "msw";
+import { http, HttpResponse } from "msw";
 import type {
   FestivalDetailInfoItem,
   FestivalDetailInfoResponse,
@@ -608,13 +608,13 @@ export const festivalHandlers = [
       return createLocationFoodResponse(request);
     }
 
-    return passthrough();
+    return;
   }),
   http.post("*/api/proxy", ({ request }) => {
     if (isFestivalProxyLikeRequest(request)) {
       return createFestivalLikeResponse(request);
     }
 
-    return passthrough();
+    return;
   }),
 ];

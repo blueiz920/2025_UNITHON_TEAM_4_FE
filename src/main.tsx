@@ -3,6 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { isOwnBackendRequest } from './mocks/isOwnBackendRequest'
 
 async function bootstrap() {
   if (import.meta.env.VITE_API_MODE === "mock") {
@@ -13,7 +14,9 @@ async function bootstrap() {
         serviceWorker: {
           url: "/mockServiceWorker.js",
         },
-        onUnhandledRequest: "bypass",
+        onUnhandledRequest: (request, print) => {
+          if (isOwnBackendRequest(request)) print.error();
+        },
       });
     } catch (error) {
       console.error(
