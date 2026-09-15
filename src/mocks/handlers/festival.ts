@@ -14,16 +14,20 @@ import type {
 } from "../../types/festival";
 import { mockFestivals } from "../data/festivals";
 import {
+  getFestivalDetailCommonLocale,
   getFestivalDetailMetadata,
   getFestivalDetailSectionLabels,
 } from "../data/festivalDetails";
 import {
-  DEFAULT_FESTIVAL_SEARCH_LANGUAGE,
   festivalSearchAliases,
   isFestivalFilterKeyword,
-  isFestivalSearchLanguage,
 } from "../data/festivalSearchAliases";
 import type { FestivalSearchLanguage } from "../data/festivalSearchAliases";
+import {
+  getFestivalSearchableText,
+  getLocalizedFestival,
+  resolveFestivalLanguage,
+} from "../data/festivalLocalization";
 import {
   readFestivalLikes,
   toggleStoredFestivalLike,
@@ -70,6 +74,7 @@ function getFestivalListParams(request: Request) {
   const searchParams = getRequestSearchParams(request);
 
   return {
+    lang: resolveFestivalLanguage(searchParams.get("lang")),
     pageNo: parsePositiveInteger(searchParams.get("pageNo"), DEFAULT_PAGE_NO),
     numOfRows: parsePositiveInteger(
       searchParams.get("numOfRows"),
@@ -82,7 +87,7 @@ function getFestivalListParams(request: Request) {
 }
 
 function createFestivalListResponse(request: Request) {
-  const { pageNo, numOfRows, eventStartDate, eventEndDate, areaCode } =
+  const { lang, pageNo, numOfRows, eventStartDate, eventEndDate, areaCode } =
     getFestivalListParams(request);
   const filteredFestivals = mockFestivals.filter((festival) => {
     const festivalStartDate = normalizeDate(festival.eventstartdate ?? null);
@@ -99,7 +104,9 @@ function createFestivalListResponse(request: Request) {
     return true;
   });
   const startIndex = (pageNo - 1) * numOfRows;
-  const item = filteredFestivals.slice(startIndex, startIndex + numOfRows);
+  const item = filteredFestivals
+    .slice(startIndex, startIndex + numOfRows)
+    .map((festival) => getLocalizedFestival(festival, lang));
 
   const response: FestivalListResponse = {
     status: 200,
@@ -135,36 +142,13 @@ function getFestivalSearchParams(request: Request) {
 
   return {
     keyword: normalizeKeyword(searchParams.get("keyword")),
-    lang: isFestivalSearchLanguage(requestedLanguage)
-      ? requestedLanguage
-      : DEFAULT_FESTIVAL_SEARCH_LANGUAGE,
+    lang: resolveFestivalLanguage(requestedLanguage),
     pageNo: parsePositiveInteger(searchParams.get("pageNo"), DEFAULT_PAGE_NO),
     numOfRows: parsePositiveInteger(
       searchParams.get("numOfRows"),
       DEFAULT_NUM_OF_ROWS,
     ),
   };
-}
-
-function getFestivalSearchableText(
-  festival: (typeof mockFestivals)[number],
-  lang: FestivalSearchLanguage,
-) {
-  const searchTerms = festivalSearchAliases[festival.contentid]?.[lang];
-  const aliases = searchTerms?.aliases ?? [];
-  const tags = searchTerms?.tags ?? [];
-
-  return [
-    festival.title,
-    festival.overview,
-    festival.addr1,
-    festival.addr2,
-    ...aliases,
-    ...tags,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" ")
-    .toLowerCase();
 }
 
 function matchesFestivalSearchKeyword(
@@ -189,7 +173,9 @@ function createFestivalSearchResponse(request: Request) {
       )
     : mockFestivals;
   const startIndex = (pageNo - 1) * numOfRows;
-  const item = filteredFestivals.slice(startIndex, startIndex + numOfRows);
+  const item = filteredFestivals
+    .slice(startIndex, startIndex + numOfRows)
+    .map((festival) => getLocalizedFestival(festival, lang));
 
   const response: FestivalListResponse = {
     status: 200,
@@ -222,9 +208,7 @@ function getFestivalDetailParams(request: Request) {
   return {
     contentId: searchParams.get("contentId")?.trim() || undefined,
     contentTypeId: searchParams.get("contentTypeId")?.trim() || undefined,
-    lang: isFestivalSearchLanguage(requestedLanguage)
-      ? requestedLanguage
-      : DEFAULT_FESTIVAL_SEARCH_LANGUAGE,
+    lang: resolveFestivalLanguage(requestedLanguage),
   };
 }
 
@@ -243,30 +227,35 @@ function findFestivalByDetailParams(
   );
 }
 
-function createFestivalInfoItem(festival: (typeof mockFestivals)[number]): FestivalInfoItem {
+function createFestivalInfoItem(
+  festival: (typeof mockFestivals)[number],
+  lang: FestivalSearchLanguage,
+): FestivalInfoItem {
+  const localizedFestival = getLocalizedFestival(festival, lang);
+
   return {
-    contentid: festival.contentid,
-    contenttypeid: festival.contenttypeid,
-    addr1: festival.addr1,
-    addr2: festival.addr2 ?? "",
+    contentid: localizedFestival.contentid,
+    contenttypeid: localizedFestival.contenttypeid,
+    addr1: localizedFestival.addr1,
+    addr2: localizedFestival.addr2 ?? "",
     areacode: festival.areacode,
     createdtime: festival.createdtime,
     firstimage: festival.firstimage,
     firstimage2: festival.firstimage2,
-    mapx: festival.mapx,
-    mapy: festival.mapy,
+    mapx: localizedFestival.mapx,
+    mapy: localizedFestival.mapy,
     modifiedtime: festival.modifiedtime,
-    tel: festival.tel,
-    title: festival.title,
-    zipcode: festival.zipcode ?? "",
-    overview: festival.overview ?? "",
+    tel: localizedFestival.tel,
+    title: localizedFestival.title,
+    zipcode: localizedFestival.zipcode ?? "",
+    overview: localizedFestival.overview ?? "",
   };
 }
 
 function createFestivalInfoResponse(request: Request) {
-  const { contentId } = getFestivalDetailParams(request);
+  const { contentId, lang } = getFestivalDetailParams(request);
   const festival = findFestivalByContentId(contentId);
-  const item = festival ? [createFestivalInfoItem(festival)] : [];
+  const item = festival ? [createFestivalInfoItem(festival, lang)] : [];
 
   const response: FestivalInfoResponse = {
     status: 200,
@@ -291,9 +280,13 @@ function createFestivalInfoResponse(request: Request) {
 }
 
 function createFestivalDetailIntroResponse(request: Request) {
-  const { contentId, contentTypeId } = getFestivalDetailParams(request);
+  const { contentId, contentTypeId, lang } = getFestivalDetailParams(request);
   const festival = findFestivalByDetailParams(contentId, contentTypeId);
-  const metadata = festival ? getFestivalDetailMetadata(festival) : undefined;
+  const metadata = festival ? getFestivalDetailMetadata(festival, lang) : undefined;
+  const localizedFestival = festival
+    ? getLocalizedFestival(festival, lang)
+    : undefined;
+  const common = getFestivalDetailCommonLocale(lang);
   const item: FestivalDetailIntroItem[] = festival && metadata
     ? [
         {
@@ -305,15 +298,15 @@ function createFestivalDetailIntroResponse(request: Request) {
           playtime: "10:00 ~ 20:00",
           eventplace: metadata.eventplace,
           eventhomepage: "https://festival-demo.example",
-          agelimit: "전 연령",
-          bookingplace: "현장 접수",
-          placeinfo: `${festival.addr1} ${festival.addr2 ?? ""}`.trim(),
-          subevent: "현장 참여 프로그램",
+          agelimit: common.ageLimit,
+          bookingplace: common.bookingPlace,
+          placeinfo: `${localizedFestival?.addr1 ?? ""} ${localizedFestival?.addr2 ?? ""}`.trim(),
+          subevent: common.subEvent,
           program: metadata.program,
           eventstartdate: festival.eventstartdate,
-          usetimefestival: "무료",
-          discountinfofestival: "일부 체험 프로그램은 현장 안내를 확인해 주세요.",
-          spendtimefestival: "약 2시간",
+          usetimefestival: common.usageFee,
+          discountinfofestival: common.discountInfo,
+          spendtimefestival: common.spendTime,
           festivalgrade: "",
         },
       ]
@@ -344,7 +337,7 @@ function createFestivalDetailIntroResponse(request: Request) {
 function createFestivalDetailInfoResponse(request: Request) {
   const { contentId, contentTypeId, lang } = getFestivalDetailParams(request);
   const festival = findFestivalByDetailParams(contentId, contentTypeId);
-  const metadata = festival ? getFestivalDetailMetadata(festival) : undefined;
+  const metadata = festival ? getFestivalDetailMetadata(festival, lang) : undefined;
   const sectionLabels = getFestivalDetailSectionLabels(lang);
   const item: FestivalDetailInfoItem[] = festival && metadata
     ? [
@@ -393,6 +386,7 @@ function getLocationFoodParams(request: Request) {
   const searchParams = getRequestSearchParams(request);
 
   return {
+    lang: resolveFestivalLanguage(searchParams.get("lang")),
     mapx: searchParams.get("MapX")?.trim() ?? "",
     mapy: searchParams.get("MapY")?.trim() ?? "",
     pageNo: parsePositiveInteger(searchParams.get("PageNo"), DEFAULT_PAGE_NO),
@@ -427,11 +421,11 @@ function createLocationFoodItem(
 }
 
 function createLocationFoodResponse(request: Request) {
-  const { mapx, mapy, pageNo, numOfRows, radius } = getLocationFoodParams(request);
+  const { lang, mapx, mapy, pageNo, numOfRows, radius } = getLocationFoodParams(request);
   const festival = mockFestivals.find(
     (candidate) => candidate.mapx === mapx && candidate.mapy === mapy,
   );
-  const metadata = festival ? getFestivalDetailMetadata(festival) : undefined;
+  const metadata = festival ? getFestivalDetailMetadata(festival, lang) : undefined;
   const filteredFoods = metadata?.foods.filter((food) => Number(food.dist) <= radius) ?? [];
   const startIndex = (pageNo - 1) * numOfRows;
   const item = festival
