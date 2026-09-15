@@ -25,7 +25,7 @@ function getRelativeEventDates(startOffset: number, endOffset: number) {
   };
 }
 
-export const mockFestivalBases: FestivalBase[] = [
+export const mockFestivalBases = [
   {
     areacode: "1",
     contentid: "mock-festival-001",
@@ -278,4 +278,7 @@ export const mockFestivalBases: FestivalBase[] = [
     zipcode: "63362",
     ...getRelativeEventDates(60, 75),
   },
-];
+] as const satisfies readonly FestivalBase[];
+
+export type FestivalContentId =
+  (typeof mockFestivalBases)[number]["contentid"];

@@ -1,4 +1,5 @@
 import type { FestivalSearchLanguage } from "./festivalSearchAliases";
+import type { FestivalContentId } from "./festivals";
 
 export type FestivalLocalizedFields = {
   title: string;
@@ -12,7 +13,7 @@ type FestivalLocaleMap = Record<
   FestivalLocalizedFields
 >;
 
-export const festivalLocales: Record<string, FestivalLocaleMap> = {
+export const festivalLocales = {
   "mock-festival-001": {
     kor: {
       title: "서울빛축제",
@@ -877,4 +878,4 @@ export const festivalLocales: Record<string, FestivalLocaleMap> = {
         "Местный фестиваль, знакомящий с жизнью хэнё Чеджу и морской культурой.",
     },
   },
-};
+} satisfies Record<FestivalContentId, FestivalLocaleMap>;

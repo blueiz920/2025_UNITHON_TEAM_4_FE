@@ -5,8 +5,12 @@ import {
   isFestivalSearchLanguage,
   type FestivalSearchLanguage,
 } from "./festivalSearchAliases";
-import type { FestivalBase } from "./festivals";
+import type { FestivalBase, FestivalContentId } from "./festivals";
 import { festivalLocales, type FestivalLocalizedFields } from "./festivalLocales";
+
+function isFestivalContentId(value: string): value is FestivalContentId {
+  return Object.prototype.hasOwnProperty.call(festivalLocales, value);
+}
 
 export function resolveFestivalLanguage(
   value: string | null | undefined,
@@ -23,7 +27,9 @@ export function getFestivalLocale(
   lang: string | null | undefined,
 ): FestivalLocalizedFields | undefined {
   const language = resolveFestivalLanguage(lang);
-  const locale = festivalLocales[contentId];
+  const locale = isFestivalContentId(contentId)
+    ? festivalLocales[contentId]
+    : undefined;
 
   return locale?.[language] ?? locale?.[DEFAULT_FESTIVAL_SEARCH_LANGUAGE];
 }
