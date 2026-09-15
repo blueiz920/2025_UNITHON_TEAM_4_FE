@@ -7,7 +7,7 @@ This template provides a minimal setup to get React working in Vite with HMR and
 앱은 `VITE_API_MODE` 값으로 API 실행 모드를 선택합니다.
 
 - `server`: 실제 API 요청을 사용합니다. 값이 없거나 `mock`이 아니면 이 모드로 동작합니다.
-- `mock`: 앱 렌더링 전에 MSW Service Worker를 시작합니다. 아직 mock handler가 추가되지 않은 요청은 실제 네트워크로 전달됩니다.
+- `mock`: 앱 렌더링 전에 MSW Service Worker를 시작합니다. 앱 Backend 요청 중 handler가 없는 요청은 Demo에서 차단하고, 외부 이미지·정적 리소스는 실제 네트워크를 사용합니다. 로그인·회원가입 경로는 MyPage로 이동합니다.
 
 로컬에서는 `.env.example`을 참고해 `.env`를 만들고 기본값인 `server` 모드로 실행합니다. Vercel Production에서는 프로젝트 환경 변수에 `VITE_API_MODE=mock`을 설정해 Demo API 모드로 실행합니다.
 
