@@ -20,28 +20,24 @@ export function resolveFestivalLanguage(
 export function getFestivalLocale(
   contentId: string,
   lang: string | null | undefined,
-): FestivalLocalizedFields {
+): FestivalLocalizedFields | undefined {
   const language = resolveFestivalLanguage(lang);
   const locale = festivalLocales[contentId];
 
-  return (
-    locale?.[language] ??
-    locale?.[DEFAULT_FESTIVAL_SEARCH_LANGUAGE] ?? {
-      title: "",
-      addr1: "",
-      addr2: "",
-      overview: "",
-    }
-  );
+  return locale?.[language] ?? locale?.[DEFAULT_FESTIVAL_SEARCH_LANGUAGE];
 }
 
 export function getLocalizedFestival(
   festival: FestivalListItem,
   lang: string | null | undefined,
 ): FestivalListItem {
+  const locale = getFestivalLocale(festival.contentid, lang);
+
+  if (!locale) return festival;
+
   return {
     ...festival,
-    ...getFestivalLocale(festival.contentid, lang),
+    ...locale,
   };
 }
 
