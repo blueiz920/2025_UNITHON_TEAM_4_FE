@@ -1,8 +1,8 @@
-import type { FestivalListItem } from "../../types/festival";
 import {
   getLocalizedFestival,
   resolveFestivalLanguage,
 } from "./festivalLocalization";
+import type { FestivalBase } from "./festivals";
 import type { FestivalSearchLanguage } from "./festivalSearchAliases";
 
 export type FestivalFoodMetadata = {
@@ -496,7 +496,7 @@ const festivalDetailMetadataLocales: Partial<
 };
 
 function createFallbackMetadata(
-  festival: FestivalListItem,
+  festival: FestivalBase,
   lang: FestivalSearchLanguage,
 ): FestivalDetailMetadata {
   const localizedFestival = getLocalizedFestival(festival, lang);
@@ -536,7 +536,7 @@ function createFallbackMetadata(
 }
 
 export function getFestivalDetailMetadata(
-  festival: FestivalListItem,
+  festival: FestivalBase,
   lang: string | null | undefined = "kor",
 ) {
   const language = resolveFestivalLanguage(lang);

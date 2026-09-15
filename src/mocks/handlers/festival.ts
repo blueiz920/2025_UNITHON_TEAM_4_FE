@@ -12,7 +12,7 @@ import type {
   LocationFoodItem,
   LocationFoodResponse,
 } from "../../types/festival";
-import { mockFestivals } from "../data/festivals";
+import { mockFestivalBases } from "../data/festivals";
 import {
   getFestivalDetailCommonLocale,
   getFestivalDetailMetadata,
@@ -89,7 +89,7 @@ function getFestivalListParams(request: Request) {
 function createFestivalListResponse(request: Request) {
   const { lang, pageNo, numOfRows, eventStartDate, eventEndDate, areaCode } =
     getFestivalListParams(request);
-  const filteredFestivals = mockFestivals.filter((festival) => {
+  const filteredFestivals = mockFestivalBases.filter((festival) => {
     const festivalStartDate = normalizeDate(festival.eventstartdate ?? null);
     const festivalEndDate = normalizeDate(festival.eventenddate ?? null);
 
@@ -152,7 +152,7 @@ function getFestivalSearchParams(request: Request) {
 }
 
 function matchesFestivalSearchKeyword(
-  festival: (typeof mockFestivals)[number],
+  festival: (typeof mockFestivalBases)[number],
   keyword: string,
   lang: FestivalSearchLanguage,
 ) {
@@ -168,10 +168,10 @@ function matchesFestivalSearchKeyword(
 function createFestivalSearchResponse(request: Request) {
   const { keyword, lang, pageNo, numOfRows } = getFestivalSearchParams(request);
   const filteredFestivals = keyword
-    ? mockFestivals.filter((festival) =>
+    ? mockFestivalBases.filter((festival) =>
         matchesFestivalSearchKeyword(festival, keyword, lang),
       )
-    : mockFestivals;
+    : mockFestivalBases;
   const startIndex = (pageNo - 1) * numOfRows;
   const item = filteredFestivals
     .slice(startIndex, startIndex + numOfRows)
@@ -213,14 +213,14 @@ function getFestivalDetailParams(request: Request) {
 }
 
 function findFestivalByContentId(contentId?: string) {
-  return mockFestivals.find((festival) => festival.contentid === contentId);
+  return mockFestivalBases.find((festival) => festival.contentid === contentId);
 }
 
 function findFestivalByDetailParams(
   contentId?: string,
   contentTypeId?: string,
 ) {
-  return mockFestivals.find(
+  return mockFestivalBases.find(
     (festival) =>
       festival.contentid === contentId &&
       festival.contenttypeid === contentTypeId,
@@ -228,7 +228,7 @@ function findFestivalByDetailParams(
 }
 
 function createFestivalInfoItem(
-  festival: (typeof mockFestivals)[number],
+  festival: (typeof mockFestivalBases)[number],
   lang: FestivalSearchLanguage,
 ): FestivalInfoItem {
   const localizedFestival = getLocalizedFestival(festival, lang);
@@ -396,7 +396,7 @@ function getLocationFoodParams(request: Request) {
 }
 
 function createLocationFoodItem(
-  festival: (typeof mockFestivals)[number],
+  festival: (typeof mockFestivalBases)[number],
   food: ReturnType<typeof getFestivalDetailMetadata>["foods"][number],
   index: number,
 ): LocationFoodItem {
@@ -422,7 +422,7 @@ function createLocationFoodItem(
 
 function createLocationFoodResponse(request: Request) {
   const { lang, mapx, mapy, pageNo, numOfRows, radius } = getLocationFoodParams(request);
-  const festival = mockFestivals.find(
+  const festival = mockFestivalBases.find(
     (candidate) => candidate.mapx === mapx && candidate.mapy === mapy,
   );
   const metadata = festival ? getFestivalDetailMetadata(festival, lang) : undefined;

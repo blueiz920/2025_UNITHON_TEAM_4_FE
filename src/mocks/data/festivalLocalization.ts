@@ -5,6 +5,7 @@ import {
   isFestivalSearchLanguage,
   type FestivalSearchLanguage,
 } from "./festivalSearchAliases";
+import type { FestivalBase } from "./festivals";
 import { festivalLocales, type FestivalLocalizedFields } from "./festivalLocales";
 
 export function resolveFestivalLanguage(
@@ -28,12 +29,14 @@ export function getFestivalLocale(
 }
 
 export function getLocalizedFestival(
-  festival: FestivalListItem,
+  festival: FestivalBase,
   lang: string | null | undefined,
 ): FestivalListItem {
   const locale = getFestivalLocale(festival.contentid, lang);
 
-  if (!locale) return festival;
+  if (!locale) {
+    throw new Error(`Missing festival locale for ${festival.contentid}`);
+  }
 
   return {
     ...festival,
@@ -42,7 +45,7 @@ export function getLocalizedFestival(
 }
 
 export function getFestivalSearchableText(
-  festival: FestivalListItem,
+  festival: FestivalBase,
   lang: string | null | undefined,
 ) {
   const language = resolveFestivalLanguage(lang);
