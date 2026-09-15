@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouteObject } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouteObject } from "react-router-dom";
 import RoutePath from "./routePath";
 import MainPage from "../pages/Main";
 // import OnboardingPage from "@/pages/Onboarding";
@@ -13,6 +13,9 @@ import CreatePostPage from "../pages/Community/create";
 import PostModifyPage from "../pages/Mypage/postModify";
 import FestivalDetailPage from "../pages/Festival/festivalDetail";
 import AccountSettingPage from "../pages/Mypage/accountSetting";
+
+const isDemoMode = import.meta.env.VITE_API_MODE === "mock";
+
 const routes: RouteObject[] = [
   { path: RoutePath.Main, element: <MainPage /> },
   // { path: RoutePath.Onboarding, element: <OnboardingPage /> },
@@ -20,8 +23,14 @@ const routes: RouteObject[] = [
   { path: RoutePath.FestivalPeriod, element: <FestivalPeriodPage /> },
   { path: RoutePath.FestivalDetail, element: <FestivalDetailPage /> },
   { path: RoutePath.Community, element: <CommunityPage /> },
-  { path: RoutePath.Login, element: <LoginPage /> },
-  { path: RoutePath.Signup, element: <SignupPage /> },
+  {
+    path: RoutePath.Login,
+    element: isDemoMode ? <Navigate to={RoutePath.MyPage} replace /> : <LoginPage />,
+  },
+  {
+    path: RoutePath.Signup,
+    element: isDemoMode ? <Navigate to={RoutePath.MyPage} replace /> : <SignupPage />,
+  },
   { path: RoutePath.MyPage, element: <MyPage /> },
   { path: RoutePath.PostPage, element: <PostPage /> },
   { path: RoutePath.CreatePostPage, element: <CreatePostPage /> },
