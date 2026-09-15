@@ -74,8 +74,16 @@ export function useInfiniteFestivalList(params: GetFestivalListParams = {}) {
   return useInfiniteQuery<{ item: FestivalListItem[]; totalCount: number }>({
     queryKey: ["festivalsInfinite", { ...params, lang }],
     queryFn: ({ pageParam = 1 }) => fetchFestivalList({ ...params, lang, pageNo: pageParam as number }),
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.item.length === 8 ? allPages.length + 1 : undefined,
+    getNextPageParam: (lastPage, allPages) => {
+      const loadedCount = allPages.reduce(
+        (total, page) => total + page.item.length,
+        0,
+      );
+
+      return loadedCount < lastPage.totalCount
+        ? allPages.length + 1
+        : undefined;
+    },
     initialPageParam: 1,
     staleTime: 1000 * 60,
   });
